@@ -1,9 +1,22 @@
 [tool.poetry]
 name = "commonroad-prediction"
 version = "0.1.0"
-description = "Collection and Interface of CommonRoad Prediction Algorithms"
+description = "Collection and interface of CommonRoad prediction algorithms."
 readme = "README.md"
-authors = [""]
+authors = ["Cyber-Physical Systems Group, Technical University of Munich <commonroad@lists.lrz.de>"]
+license = "BSD"
+homepage = "https://commonroad.in.tum.de"
+keywords= ["autonomous", "automated", "vehicles", "driving", "motion", "planning", "prediction"]
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows"
+]
 packages = [{include = "crpred"}]
 
 [tool.poetry.dependencies]

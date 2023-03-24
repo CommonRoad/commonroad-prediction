@@ -13,7 +13,6 @@ class IDMAgent(Agent):
     """
 
     def __init__(self, obstacle: DynamicObstacle, config: IDMParams = IDMParams()):
-        # initialize the parent class
         super(IDMAgent, self).__init__(obstacle)
 
         self.list_lanelets_merged = list()
