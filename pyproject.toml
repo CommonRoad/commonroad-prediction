@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "commonroad-prediction"
+version = "0.1.0"
+description = "Collection and Interface of CommonRoad Prediction Algorithms"
+readme = "README.md"
+authors = [""]
+packages = [{include = "crpred"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+commonroad-io = ">=2023.1"
+commonroad-drivability-checker = "^2022.2.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
