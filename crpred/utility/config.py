@@ -135,15 +135,39 @@ class BaseParam:
 
 @dataclass
 class IDMParams(BaseParam):
+    """Parameters of IDM prediction algorithm."""
+
     v_desired: float = 20.0
     dist_min: float = 4.0
     time_headway: float = 1.0
     a_lon_max: float = 3.0
-    a_lon_min: float = -6.0,
+    a_lon_min: float = -6.0
     a_lon_comfort: float = 1.5
     coef: float = 4
 
 
 @dataclass
+class MobilParams(BaseParam):
+    """Parameters of Mobil prediction algorithm."""
+
+    v_desired: float = 20.0
+    dist_min: float = 4.0
+    time_headway: float = 2.0
+    a_lon_max: float = 3.0
+    a_lon_min: float = -6.0
+    a_lon_comfort: float = 1.5
+    coef: float = 4.0
+    b_safe: float = 2.0
+    p: float = 0.1
+    a_th: float = 0.1
+    a_bias: float = 0.3
+    v_crit: float = 10.0
+    assert a_th >= 0, "<MOBIL> a_th is negative"
+
+
+@dataclass
 class PredictorParams(BaseParam):
     """All CR-Prediction parameters"""
+
+    idm: IDMParams = field(default_factory=IDMParams)
+    mobil: MobilParams = field(default_factory=MobilParams)

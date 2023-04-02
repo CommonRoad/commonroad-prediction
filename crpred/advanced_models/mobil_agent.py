@@ -5,20 +5,16 @@ from commonroad.prediction.prediction import Occupancy
 from commonroad.scenario.obstacle import DynamicObstacle
 from commonroad.scenario.trajectory import State
 
-from motion_planner_components.prediction.advanced_models.agent import Agent
+from crpred.advanced_models.agent import Agent
+from crpred.utility.config import MobilParams
 
 
 class MOBILAgent(Agent):
-    """
-    MOBIL Predictor.
-    """
-    cls_parameters: dict = {'v_desired': 20, 'dist_min': 4, 'time_headway': 2,
-                            'a_lon_max': 3, 'a_lon_min': -6, 'a_lon_comfort': 1.5, 'coef': 4,
-                            'b_safe': 2, 'p': 0.1, 'a_th': 0.1, 'a_bias': 0.3, 'v_crit': 10}
+    """MOBIL Predictor."""
 
-    def __init__(self, obstacle: DynamicObstacle, parameters: dict = None):
+    def __init__(self, obstacle: DynamicObstacle, dt: float = 0.1, config: MobilParams = MobilParams()):
         # initialize the parent class
-        super(MOBILAgent, self).__init__(obstacle)
+        super().__init__(obstacle, dt)
 
         self.dict_all_merged_lanelets = {}
         self.dict_all_merged_lanelets_containing_id = {}
@@ -27,11 +23,11 @@ class MOBILAgent(Agent):
         self.dict_clcs_ego = {}
         self.dict_lanelet_merge_ids_ego = {}
 
-        self.list_lanelets_merged_left = list()
+        self.list_lanelets_merged_left = []
         self.dict_clcs_left = {}
         self.dict_lanelet_merge_ids_left = {}
 
-        self.list_lanelets_merged_right = list()
+        self.list_lanelets_merged_right = []
         self.dict_clcs_right = {}
         self.dict_lanelet_merge_ids_right = {}
 
@@ -43,22 +39,6 @@ class MOBILAgent(Agent):
 
         self.clcs_main = \
             self.dict_clcs_ego[main_lanelet_id][self.dict_list_lanelets_merged_ego[main_lanelet_id][0].lanelet_id]
-
-        self.parameters = parameters if parameters else self.cls_parameters.copy()
-        self.v_desired = self.parameters['v_desired']
-        self.dist_keep_min = self.parameters['dist_min']
-        self.time_headway = self.parameters['time_headway']
-        self.a_lon_max = self.parameters['a_lon_max']
-        self.a_lon_min = self.parameters['a_lon_min']
-        self.a_lon_comfort = self.parameters['a_lon_comfort']
-        self.coef = self.parameters['coef']
-        self.b_safe = self.parameters['b_safe']
-        self.p = self.parameters['p']
-
-        assert self.parameters['a_th'] >= 0, "<MOBIL> a_th is negative"
-        self.a_th = self.parameters['a_th']
-        self.a_bias = self.parameters['a_bias']
-        self.v_crit = self.parameters['v_crit']
 
     def step_forward(self, time_step: int):
         if self.time_step_initial >= time_step or not self.valid:
@@ -96,11 +76,11 @@ class MOBILAgent(Agent):
                 self.dict_clcs_ego = {}
                 self.dict_lanelet_merge_ids_ego = {}
 
-                self.list_lanelets_merged_left = list()
+                self.list_lanelets_merged_left = []
                 self.dict_clcs_left = {}
                 self.dict_lanelet_merge_ids_left = {}
 
-                self.list_lanelets_merged_right = list()
+                self.list_lanelets_merged_right = []
                 self.dict_clcs_right = {}
                 self.dict_lanelet_merge_ids_right = {}
 

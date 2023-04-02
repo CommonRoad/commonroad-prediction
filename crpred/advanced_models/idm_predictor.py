@@ -12,15 +12,16 @@ class IDMPredictor(AgentPredictor):
 
     def predict(self, sc: Scenario, initial_time_step: int = 0):
         clear_obstacle_trajectory(sc, initial_time_step)
-        self.list_agents = list()
+        self.list_agents = []
         for obs in sc.dynamic_obstacles:
-            self.list_agents.append(IDMAgent(obs))
+            self.list_agents.append(IDMAgent(obs, sc))
 
         for time_step in range(initial_time_step + 1, initial_time_step + self._config.num_steps_prediction + 1):
             for agent in self.list_agents:
                 agent.step_forward(time_step)
 
             self._assign_agents_to_lanelets(sc, time_step)
+
         return sc
 
     def visualize(self, sc: Scenario, step=0):

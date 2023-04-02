@@ -1,11 +1,11 @@
-from motion_planner_components.prediction.advanced_models.agent_predictor import AgentPredictor
-from motion_planner_components.prediction.advanced_models.mobil_agent import MOBILAgent
-from motion_planner_components.prediction.utility import visualization as util_visualization
-from motion_planner_config.configuration_builder import Configuration
+from crpred.advanced_models.agent_predictor import AgentPredictor
+from crpred.advanced_models.mobil_agent import MOBILAgent
+from crpred.utility import visualization as util_visualization
+from crpred.utility.config import PredictorParams
 
 
 class MOBILPredictor(AgentPredictor):
-    def __init__(self, config: Configuration):
+    def __init__(self, config: PredictorParams = PredictorParams()):
         super(MOBILPredictor, self).__init__(config=config)
         self.num_steps_prediction = config.planning.time_steps_computation
 

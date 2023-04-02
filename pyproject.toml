@@ -24,6 +24,11 @@ python = "^3.8"
 commonroad-io = ">=2023.1"
 commonroad-drivability-checker = "^2022.2.1"
 
+[tool.poetry.group.tests]
+optional = true
+
+[tool.poetry.group.tests.dependencies]
+prospector = {extras = ["with-mypy"], version = "^1.9.0"}
 
 [build-system]
 requires = ["poetry-core"]

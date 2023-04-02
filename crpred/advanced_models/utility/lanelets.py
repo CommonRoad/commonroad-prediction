@@ -1,5 +1,4 @@
 from typing import Tuple, List
-
 from commonroad.scenario.lanelet import Lanelet, LaneletNetwork
 
 
@@ -26,7 +25,7 @@ def all_lanelets_by_merging_predecessors_from_lanelet(lanelet: 'Lanelet',
     merge_jobs = [[lanelet] + [network.find_lanelet_by_id(p) for p in path] for path in merge_jobs]
 
     # Create merged lanelets from paths
-    merged_lanelets = list()
+    merged_lanelets = []
     merge_jobs_final = []
     for path in merge_jobs:
         pred = path[0]
