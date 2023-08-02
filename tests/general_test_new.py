@@ -31,7 +31,7 @@ def trajectory_prediction_test(
     :param details: Should details be printed
     :param visualize: Should the solutions be visualized
     """
-    scenarios = get_scenarios_from_files(1, Path("tests/scenarios"))
+    scenarios = get_scenarios_from_files(1, Path("scenarios"))
 
     # set path to configurations and get configuration object
     configs = [PredictorParams()]

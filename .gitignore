@@ -228,3 +228,4 @@ build/
 
 /dist/
 /output
+/tests/output

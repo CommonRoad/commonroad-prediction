@@ -52,7 +52,7 @@ def get_scenarios_from_files(n: int, scenario_dir: Path = None):
         print(u'\u2713')  # checkmark
 
     if not result:
-        print("Warning, no files were found!")
+        raise FileNotFoundError(f"No XML files were found in {scenario_dir.absolute()})!")
 
     return random.sample(result, n)
 
