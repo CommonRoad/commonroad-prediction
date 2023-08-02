@@ -1,11 +1,13 @@
 import copy
 import os
 from copy import deepcopy
+import random
 from typing import Tuple, Dict, List, Type, Optional
 from math import sqrt
 from numpy import ndarray
 from statistics import median, mean
 from random import sample
+from pathlib import Path
 
 from commonroad.scenario.scenario import Scenario
 from commonroad.scenario.state import State
@@ -33,22 +35,26 @@ def shorten_scenario_trajectory(original_scenario: Scenario, remaining_steps: in
     return s
 
 
-def get_scenarios_from_files(n: int):
+def get_scenarios_from_files(n: int, scenario_dir: Path = None):
     """
     Reading in n random scenarios from the trajectory_prediction_tests/scenarios folder
     """
     result: List[Scenario] = []
     print(f"Reading in {str(n)} scenarios")
 
-    for dir_path, _, filenames in os.walk(os.path.join(os.getcwd(), 'scenarios/')):
-        for f in sample(filenames, n):
-            path = os.path.abspath(os.path.join(dir_path, f))
-            print(f"Reading in {f} ", end="")
-            s, _ = CommonRoadFileReader(path).open(lanelet_assignment=True)
-            result.append(s)
-            print(u'\u2713')  # checkmark
+    if scenario_dir is None:
+        scenario_dir = Path('scenarios')
 
-    return result
+    for p in scenario_dir.glob('*.xml'):
+        print(p, end=' ')
+        scenario, _ = CommonRoadFileReader(p).open(lanelet_assignment=True)
+        result.append(scenario)
+        print(u'\u2713')  # checkmark
+
+    if not result:
+        print("Warning, no files were found!")
+
+    return random.sample(result, n)
 
 
 def calc_difference(s: Scenario, p: Scenario) -> Dict[int, Dict[int, float]]:
@@ -116,53 +122,3 @@ def median_distance(distance: Dict[int, float]) -> float:
     Calculate the median between all objects in a directory
     """
     return median([d for (s, d) in distance.items()])
-
-
-def trajectory_prediction_test(predictor_clss: List[Type[PredictorInterface]], future_states_range: List[int],
-                               details: bool = False, visualize: bool = False):
-    """
-    :param predictor_clss: A list of predictor classes that should be tested
-    :param future_states_range: A list how many future states should be predicted.
-    [5, 10, 15] test all given predictors with 5, 10 and 15 future steps
-    :param details: Should details be printed
-    :param visualize: Should the solutions be visualized
-    """
-    scenarios = get_scenarios_from_files(1)
-
-    # set path to configurations and get configuration object
-    configs = [PredictorParams()]
-
-    for sc in scenarios:
-        new_sc = copy.deepcopy(sc)
-        for future_states in future_states_range:
-            print(f"Future States: {future_states}")
-            for predictor_cls in predictor_clss:
-                all_distances = []
-
-                for config in configs:
-                    config.num_steps_prediction = future_states
-
-                    ground_truth_predictor = GroundTruthPredictor(config)
-                    ground_truth = ground_truth_predictor.predict(sc)
-
-                    predictor: PredictorInterface = predictor_cls(config)
-                    prediction: Scenario = predictor.predict(new_sc)
-
-                    obstacle_distances: Dict[int, Dict[int, float]] = calc_difference(ground_truth, prediction)
-
-                    cost = cost_function(obstacle_distances)
-                    all_distances.append(cost)
-
-                    if visualize:
-                        predictor.visualize(new_sc)
-                        ground_truth_predictor.visualize(sc)
-
-                    if details:
-                        print(f"{new_sc.scenario_id}: {cost}")
-
-                print(f"Over all mean distance for {predictor_cls.__name__}: {mean(all_distances)}")
-
-
-if __name__ == "__main__":
-    predictors: List[Type[PredictorInterface]] = [IDMPredictor] #, MOBILPredictor]
-    trajectory_prediction_test(predictors, list(range(50, 51)), True, True)

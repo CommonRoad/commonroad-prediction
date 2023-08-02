@@ -20,12 +20,3 @@ class AgentPredictor(PredictorInterface):
 
                 except KeyError:
                     lanelet.dynamic_obstacles_on_lanelet[time_step] = {agent.id_agent}
-
-    def predict(self, sc: Scenario, initial_time_step: int = 0):
-        """
-        Abstract method for performing predictions.
-
-        :param sc: Scenario containing no predictions for obstacles.
-        :param initial_time_step: Time step to start prediction.
-        :return: CommonRoad scenario containing predictions.
-        """

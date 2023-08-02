@@ -1,5 +1,11 @@
 # CommonRoad-Prediction
 
+## Installation
+
+### Requirements
+- CommonRoad
+- CommonRoad Drivability Checker
+
 
 
 ## Getting started

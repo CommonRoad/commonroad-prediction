@@ -133,6 +133,16 @@ class BaseParam:
         OmegaConf.save(OmegaConf.create(dict_cfg), file_path, resolve=True)
 
 
+# @dataclass
+# class ConstantVelocityLinearParams(BaseParam):
+#     v: float = 20.0
+
+
+# @dataclass
+# class ConstantAccelerationLinearParams(BaseParam):
+#     a: float = 1.0
+
+
 @dataclass
 class IDMParams(BaseParam):
     """Parameters of IDM prediction algorithm."""

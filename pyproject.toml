@@ -33,3 +33,10 @@ prospector = {extras = ["with-mypy"], version = "^1.9.0"}
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+experimental-string-processing = true
+
+[tool.autoflake]
+max-line-length = 100
