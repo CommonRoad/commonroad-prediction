@@ -4,13 +4,12 @@ from statistics import mean
 from typing import Dict, List, Type
 
 from commonroad.scenario.scenario import Scenario
-from test_utilities import (calc_difference, cost_function,
-                            get_scenarios_from_files,
-                            shorten_scenario_trajectory)
+from test_utilities import calc_difference, cost_function, get_scenarios_from_files, shorten_scenario_trajectory
 
 from crpred.advanced_models.idm_predictor import IDMPredictor
-from crpred.basic_models.constant_velocity_predictor import \
-    ConstantVelocityLinearPredictor
+from crpred.basic_models.constant_velocity_predictor import ConstantVelocityLinearPredictor
+from crpred.basic_models.constant_acceleration_predictor import ConstantAccelerationLinearPredictor
+
 # from crpred.advanced_models.mobil_predictor import MOBILPredictor
 from crpred.ground_truth_predictor import GroundTruthPredictor
 from crpred.predictor_interface import PredictorInterface
@@ -38,15 +37,14 @@ def trajectory_prediction_test(
 
     for sc in scenarios:
         new_sc = copy.deepcopy(sc)
+        plotted_ground_truth = False
+
         for future_states in future_states_range:
             for predictor_cls in predictor_clss:
                 all_distances = []
 
                 for config in configs:
-                    print(
-                        f"\n### Testing {predictor_cls.__name__} with {future_states} future"
-                        " states."
-                    )
+                    print(f"\n### Testing {predictor_cls.__name__} with {future_states} future states.")
                     config.num_steps_prediction = future_states
 
                     ground_truth_predictor = GroundTruthPredictor(config)
@@ -55,26 +53,16 @@ def trajectory_prediction_test(
                     predictor: PredictorInterface = predictor_cls(config)
                     prediction: Scenario = predictor.predict(new_sc)
 
-                    original_position = (
-                        ground_truth.dynamic_obstacles[0]
-                        .prediction.trajectory.state_list[0]
-                        .position
-                    )
-                    predicted_position = (
-                        prediction.dynamic_obstacles[0].prediction.trajectory.state_list[0].position
-                    )
-                    print(original_position)
-                    print(predicted_position)
+                    original_position = ground_truth.dynamic_obstacles[0].prediction.trajectory.state_list[0].position
+                    predicted_position = prediction.dynamic_obstacles[0].prediction.trajectory.state_list[0].position
 
-                    obstacle_distances: Dict[int, Dict[int, float]] = calc_difference(
-                        ground_truth, prediction
-                    )
+                    obstacle_distances: Dict[int, Dict[int, float]] = calc_difference(ground_truth, prediction)
 
                     cost = cost_function(obstacle_distances)
                     all_distances.append(cost)
 
                     if visualize:
-                        output_dir = Path(f"output/{str(sc.scenario_id)}/{predictor_cls.__name__}")
+                        output_dir = Path(f"output/{str(sc.scenario_id)}")
                         # Plot the prediction
                         plot_scenario(
                             prediction,
@@ -83,18 +71,21 @@ def trajectory_prediction_test(
                             plot_occupancies=True,
                             save_plots=True,
                             save_gif=True,
-                            path_output=output_dir.joinpath("prediction"),
+                            path_output=output_dir.joinpath(predictor_cls.__name__),
                         )
                         # Plot the ground truth
-                        plot_scenario(
-                            ground_truth,
-                            step_end=config.num_steps_prediction,
-                            predictor_type=ground_truth_predictor,
-                            plot_occupancies=True,
-                            save_plots=True,
-                            save_gif=True,
-                            path_output=output_dir.joinpath("ground_truth"),
-                        )
+
+                        if not plotted_ground_truth:
+                            plot_scenario(
+                                ground_truth,
+                                step_end=config.num_steps_prediction,
+                                predictor_type=ground_truth_predictor,
+                                plot_occupancies=True,
+                                save_plots=True,
+                                save_gif=True,
+                                path_output=output_dir.joinpath("ground_truth"),
+                            )
+                            plotted_ground_truth = True
                         # predictor.visualize(new_sc)
                         # ground_truth_predictor.visualize(sc)
 
@@ -107,6 +98,7 @@ def trajectory_prediction_test(
 if __name__ == "__main__":
     predictors: List[Type[PredictorInterface]] = [
         ConstantVelocityLinearPredictor,
+        ConstantAccelerationLinearPredictor,
         # MOBILPredictor,
-    ]  
+    ]
     trajectory_prediction_test(predictors, list(range(50, 51)), True, True)

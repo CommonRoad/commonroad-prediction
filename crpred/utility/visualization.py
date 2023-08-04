@@ -72,13 +72,13 @@ def plot_scenario(scenario: Scenario, figsize: Tuple = (25, 15),
             time_stamp = int(time.time())
             time_stamps[step] = time_stamp
             # save_fig(save_gif, path_output, step, time_stamp, predictor_type)
-            save_fig(save_gif, path_output, step, "prediction", predictor_type)
+            save_fig(save_gif, path_output, step, "prediction", verbose=False)
 
         else:
             plt.show()
     
     if save_gif and save_plots:
-        make_gif(path_output, "png_prediction_", steps, "0_gif_" + str(scenario.scenario_id), duration)
+        make_gif(path_output, "png_prediction_", steps, "0_gif_" + str(scenario.scenario_id), duration, delete_imgs=True)
 
     if plot_occupancies:
         time_begin = steps[0]
@@ -143,7 +143,7 @@ def save_fig(save_gif: bool, path_output: Path, time_step: int, identifier: str 
 
 
 def make_gif(path: Path, prefix: str, steps: Union[range, List[int]],
-             file_save_name="animation", duration: float = 0.1):
+             file_save_name="animation", duration: float = 0.1, delete_imgs: bool = False):
     images = []
     filenames = []
 
@@ -153,5 +153,7 @@ def make_gif(path: Path, prefix: str, steps: Union[range, List[int]],
 
     for filename in filenames:
         images.append(imageio.imread(filename))
+        if delete_imgs:
+            filename.unlink()
 
     imageio.mimsave(path.joinpath(file_save_name + ".gif"), images, duration=duration)

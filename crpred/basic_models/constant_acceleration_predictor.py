@@ -14,7 +14,7 @@ from crpred.utility.config import PredictorParams
 from crpred.utility.common import get_merged_laneletes_from_position
 
 
-class ConstantVelocityLinearPredictor(PredictorInterface):
+class ConstantAccelerationLinearPredictor(PredictorInterface):
     def __init__(self, config: PredictorParams = PredictorParams()):
         super().__init__(config=config)
 
@@ -24,7 +24,6 @@ class ConstantVelocityLinearPredictor(PredictorInterface):
 
         for idx, dyno in enumerate(sc.dynamic_obstacles):
             trajectory: Trajectory = dyno.prediction.trajectory
-            # state_list: list[State] = trajectory.state_list
             pred_state_list: list[State] = copy.deepcopy(trajectory.state_list[: self._config.num_steps_prediction])
 
             dt = self._config.dt
@@ -32,6 +31,7 @@ class ConstantVelocityLinearPredictor(PredictorInterface):
                 print(f"Warning: dt from config ({dt}) is not the same as dt from the scenario ({sc.dt})")
 
             v_0: float = dyno.initial_state.velocity
+            a_0: float = dyno.initial_state.acceleration
             pos_0: np.ndarray = dyno.initial_state.position
             orientation_0: float = dyno.initial_state.orientation
 
@@ -44,21 +44,21 @@ class ConstantVelocityLinearPredictor(PredictorInterface):
             pos_lon, pos_lat = curvilinear_pos
 
             ccosy_orientation = get_orientation_at_position(curvilinear_cosy, pos_0)
-
-            # reference_orientations: np.ndarray = compute_orientation_from_polyline(reference_trajectory)  # (n, )
-            # reference_path_lengths: np.ndarray = compute_pathlength_from_polyline(reference_trajectory)  # (n, )
-            # reference_orientation_interpolated: float = np.interp(pos_lon, reference_path_lengths, reference_orientations)
-
             orientation_diff = orientation_0 - ccosy_orientation
 
-            delta_v_lon_0: float = v_0 * np.cos(orientation_diff) * dt
-            delta_v_lat_0: float = v_0 * np.sin(orientation_diff) * dt
+            a_lon_0: float = a_0 * np.cos(orientation_diff)
+            a_lat_0: float = a_0 * np.sin(orientation_diff)
+
+            v_lon: float = v_0 * np.cos(orientation_diff)
+            v_lat: float = v_0 * np.sin(orientation_diff)
 
             for t in range(initial_time_step, initial_time_step + self._config.num_steps_prediction):
                 if t >= (len(pred_state_list)):
                     break
-                pos_lon = pos_lon + delta_v_lon_0
-                pos_lat = pos_lat + delta_v_lat_0
+                pos_lon = pos_lon + v_lon * dt + a_lon_0 * 0.5 * dt ** 2
+                pos_lat = pos_lat + v_lat * dt + a_lat_0 * 0.5 * dt **2
+                v_lon = v_lon + a_lon_0 * dt
+                v_lat = v_lat + a_lat_0 * dt
 
                 # Get the cartesian positions, etc.
                 pred_pos = curvilinear_cosy.convert_to_cartesian_coords(pos_lon, pos_lat)
@@ -67,50 +67,11 @@ class ConstantVelocityLinearPredictor(PredictorInterface):
 
                 pred_state_list[t].position = pred_pos
                 pred_state_list[t].orientation = pred_orientation
-                pred_state_list[t].velocity = v_0
-                pred_state_list[t].acceleration = 0
+                pred_state_list[t].velocity = np.sqrt(v_lon**2 + v_lat**2)
+                pred_state_list[t].acceleration = a_0
 
             pred_trajectory = Trajectory(pred_state_list[0].time_step, pred_state_list)
             pred_sc.dynamic_obstacles[idx].prediction.trajectory = pred_trajectory
 
         return pred_sc
 
-
-class ConstantVelocityLinearPredictorV2(PredictorInterface):
-    def __init__(self, config: PredictorParams = PredictorParams()):
-        super().__init__(config=config)
-
-    def predict(self, sc: Scenario, initial_time_step: int = 0) -> Scenario:
-        print()
-        pred_sc = copy.deepcopy(sc)
-
-        for idx, dyno in enumerate(sc.dynamic_obstacles):
-            trajectory: Trajectory = dyno.prediction.trajectory
-            pred_state_list: list[State] = copy.deepcopy(trajectory.state_list[: self._config.num_steps_prediction])
-
-            dt = self._config.dt
-            if sc.dt != dt:
-                print(f"Warning: dt from config ({dt}) is not the same as dt from the scenario ({sc.dt})")
-
-            v_0: float = dyno.initial_state.velocity
-            pos_0: np.ndarray = dyno.initial_state.position
-            orientation_0: float = dyno.initial_state.orientation
-
-            delta_v = np.array([v_0 * np.cos(orientation_0) * dt, v_0 * np.sin(orientation_0) * dt])
-            pred_pos = pos_0
-
-            for t in range(initial_time_step, initial_time_step + self._config.num_steps_prediction):
-                if t >= (len(pred_state_list)):
-                    break
-
-                pred_pos = pred_pos + delta_v
-                pred_orientation = orientation_0
-
-                pred_state_list[t].position = pred_pos
-                pred_state_list[t].orientation = pred_orientation
-                pred_state_list[t].velocity = v_0
-
-            pred_trajectory = Trajectory(pred_state_list[0].time_step, pred_state_list)
-            pred_sc.dynamic_obstacles[idx].prediction.trajectory = pred_trajectory
-
-        return pred_sc
