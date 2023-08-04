@@ -1,4 +1,6 @@
+import numpy as np
 from commonroad.scenario.scenario import Scenario
+from commonroad.scenario.lanelet import Lanelet, LaneletNetwork
 
 
 def clear_obstacle_trajectory(sc: Scenario, initial_time_step: int = 0):
@@ -20,3 +22,15 @@ def clear_obstacle_trajectory(sc: Scenario, initial_time_step: int = 0):
                     lanelet.dynamic_obstacles_on_lanelet[time_step] = set()
 
         obstacle.prediction = None
+
+
+def get_merged_laneletes_from_position(lanelet_network: LaneletNetwork, position: np.ndarray):
+    lanelet_id_list = lanelet_network.find_lanelet_by_position([position])
+    if not lanelet_id_list:
+        raise ValueError(f"Position {position} cannot be assigned to a lanelet.")
+
+    current_lanelet = lanelet_network.find_lanelet_by_id(lanelet_id_list[0][0])
+    merged_lanelets, merged_lanelets_id = Lanelet.all_lanelets_by_merging_successors_from_lanelet(
+        current_lanelet, lanelet_network, 300
+    )
+    return merged_lanelets, merged_lanelets_id
