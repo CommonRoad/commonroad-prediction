@@ -4,23 +4,36 @@ from pathlib import Path
 from typing import Tuple, List, Union
 
 import matplotlib.pyplot as plt
+import matplotlib
 import imageio
 from commonroad.scenario.lanelet import LaneletNetwork
 from commonroad.scenario.scenario import Scenario
 from commonroad.visualization.mp_renderer import MPRenderer
 from commonroad.visualization.draw_params import MPDrawParams
+import numpy as np
+
+# from crpred.predictor_interface import PredictorInterface
 
 logger = logging.getLogger(__name__)
-logging.getLogger('PIL').setLevel(logging.WARNING)
-logging.getLogger('matplotlib.font_manager').setLevel(logging.WARNING)
+logging.getLogger("PIL").setLevel(logging.WARNING)
+logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 
 
-def plot_scenario(scenario: Scenario, figsize: Tuple = (25, 15),
-                  step_start: int = 0, step_end: int = 10, steps: List[int] = None,
-                  plot_limits: List = None, path_output: Path = None,
-                  save_gif: bool = True, duration: float = None,
-                  save_plots: bool = True, show_lanelet_label: bool = False,
-                  predictor_type: str = None, plot_occupancies: bool = False):
+def plot_scenario(
+    scenario: Scenario,
+    figsize: Tuple = (25, 15),
+    step_start: int = 0,
+    step_end: int = 10,
+    steps: List[int] = None,
+    plot_limits: List = None,
+    path_output: Path = None,
+    save_gif: bool = True,
+    duration: float = None,
+    save_plots: bool = True,
+    show_lanelet_label: bool = False,
+    predictor_type: str = None,
+    plot_occupancies: bool = False,
+):
     """
     Plots scenarios with predicted motions.
     """
@@ -76,9 +89,11 @@ def plot_scenario(scenario: Scenario, figsize: Tuple = (25, 15),
 
         else:
             plt.show()
-    
+
     if save_gif and save_plots:
-        make_gif(path_output, "png_prediction_", steps, "0_gif_" + str(scenario.scenario_id), duration, delete_imgs=True)
+        make_gif(
+            path_output, "png_prediction_", steps, "0_gif_" + str(scenario.scenario_id), duration, delete_imgs=True
+        )
 
     if plot_occupancies:
         time_begin = steps[0]
@@ -129,21 +144,27 @@ def save_fig(save_gif: bool, path_output: Path, time_step: int, identifier: str 
     if save_gif:
         # save as png
         name_figure = "png_" + identifier
-        path_figure = path_output.joinpath(f'{name_figure}_{time_step:05d}.png')
+        path_figure = path_output.joinpath(f"{name_figure}_{time_step:05d}.png")
         plt.savefig(path_figure, format="png", bbox_inches="tight", transparent=False)
 
     else:
         # save as svg
         name_figure = "svg" + identifier
-        path_figure = path_output.joinpath(f'{name_figure}_{time_step:05d}.svg')
+        path_figure = path_output.joinpath(f"{name_figure}_{time_step:05d}.svg")
         plt.savefig(path_figure, format="svg", bbox_inches="tight", transparent=False)
 
     if verbose:
         print("\tSaving", path_figure)
 
 
-def make_gif(path: Path, prefix: str, steps: Union[range, List[int]],
-             file_save_name="animation", duration: float = 0.1, delete_imgs: bool = False):
+def make_gif(
+    path: Path,
+    prefix: str,
+    steps: Union[range, List[int]],
+    file_save_name="animation",
+    duration: float = 0.1,
+    delete_imgs: bool = False,
+):
     images = []
     filenames = []
 
@@ -157,3 +178,45 @@ def make_gif(path: Path, prefix: str, steps: Union[range, List[int]],
             filename.unlink()
 
     imageio.mimsave(path.joinpath(file_save_name + ".gif"), images, duration=duration)
+
+
+def visualize_prediction(predicted_scenario: Scenario, start_step: int = 0, end_step: int = 20, obstacle_idx: int = 0) -> matplotlib.figure.Figure:
+    obstacle = predicted_scenario.dynamic_obstacles[obstacle_idx]
+    state_list = obstacle.prediction.trajectory.state_list
+
+    dt = predicted_scenario.dt
+    orientation_0 = obstacle.initial_state.orientation
+    position_0 = obstacle.initial_state.position
+    v_0: float = obstacle.initial_state.velocity
+
+    velocity_0 = (
+        v_0 * np.cos(orientation_0) * dt,
+        v_0 * np.sin(orientation_0) * dt,
+    )
+
+    fig, ax = plt.subplots()
+    ax.scatter(position_0[0], position_0[1], c="red")
+    ax.arrow(
+        position_0[0],
+        position_0[1],
+        velocity_0[0],
+        velocity_0[1],
+    )
+
+    # for state in state_list:
+    for i in range(start_step, end_step):
+        state = state_list[i]
+        ax.scatter(state.position[0], state.position[1], c="blue")
+        
+        state_velocity = (
+            state.velocity * np.cos(state.orientation) * dt,
+            state.velocity * np.sin(state.orientation) * dt,
+        )
+        ax.arrow(
+            state.position[0],
+            state.position[1],
+            state_velocity[0],
+            state_velocity[1],
+        )
+
+    return fig
