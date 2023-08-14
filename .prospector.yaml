@@ -13,7 +13,6 @@ ignore-paths:
   - scenarios/
   - tutorials
 autodetect: false
-autodetect: false
 max-line-length: 120
 
 pycodestyle:
