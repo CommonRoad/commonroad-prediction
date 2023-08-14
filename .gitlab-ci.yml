@@ -1,0 +1,27 @@
+image: python:3.10
+
+stages:
+  - static_check
+  - test
+  - build
+
+before_script:
+  - pip install poetry
+  - poetry config installer.modern-installation false # this should be removed in the future, required because of invalid third-party wheels (https://github.com/python-poetry/poetry/issues/7686)
+  - poetry config virtualenvs.in-project true
+  - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.lrz.de/".insteadOf "git@gitlab.lrz.de:"
+  - poetry install --with tests
+  - source .venv/bin/activate
+
+.install-and-run: &install-and-run
+  - pip install tox coverage
+  - coverage run --source ./ -m unittest tests/run_tests.py
+  - coverage report -m --omit="*/src/*,*/tests/*" || true
+
+# static_check
+prospector_source:
+  stage: static_check
+  image: python:3.10
+  script:
+    - python -m pip install prospector[with_mypy]
+    - prospector crpred/
