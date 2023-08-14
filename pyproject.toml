@@ -21,8 +21,8 @@ packages = [{include = "crpred"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-commonroad-io = ">=2023.1"
-commonroad-drivability-checker = "^2022.2.1"
+commonroad-io = ">=2023.2"
+commonroad-drivability-checker = "^2023.1"
 
 [tool.poetry.group.tests]
 optional = true
