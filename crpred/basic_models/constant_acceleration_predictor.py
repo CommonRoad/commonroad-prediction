@@ -39,26 +39,23 @@ class ConstantAccelerationLinearPredictor(PredictorInterface):
 
             # reference_trajectory: np.ndarray = merged_lanelets[0].center_vertices  # (n, 2)
             curvilinear_cosy: CurvilinearCoordinateSystem = create_cosy_from_lanelet(merged_lanelets[0])
-
             curvilinear_pos: tuple[float, float] = curvilinear_cosy.convert_to_curvilinear_coords(pos_0[0], pos_0[1])
             pos_lon, pos_lat = curvilinear_pos
 
+            # Initialization
             ccosy_orientation = get_orientation_at_position(curvilinear_cosy, pos_0)
             orientation_diff = orientation_0 - ccosy_orientation
-
-            a_lon_0: float = a_0 * np.cos(orientation_diff)
-            a_lat_0: float = a_0 * np.sin(orientation_diff)
-
             v_lon: float = v_0 * np.cos(orientation_diff)
             v_lat: float = v_0 * np.sin(orientation_diff)
 
             for t in range(initial_time_step, initial_time_step + self._config.num_steps_prediction):
                 if t >= (len(pred_state_list)):
                     break
-                pos_lon = pos_lon + v_lon * dt + a_lon_0 * 0.5 * dt ** 2
-                pos_lat = pos_lat + v_lat * dt + a_lat_0 * 0.5 * dt **2
-                v_lon = v_lon + a_lon_0 * dt
-                v_lat = v_lat + a_lat_0 * dt
+                # Prediction
+                pos_lon = pos_lon + np.cos(orientation_diff) * (v_lon + 0.5 * a_0 * dt) * dt
+                pos_lat = pos_lat + v_lat * dt
+
+                v_lon = v_lon + a_0 * dt  # You can only accelerate in the longitudinal direction
 
                 # Get the cartesian positions, etc.
                 pred_pos = curvilinear_cosy.convert_to_cartesian_coords(pos_lon, pos_lat)
@@ -81,11 +78,11 @@ class ConstantAccelerationCurvilinearPredictor(PredictorInterface):
         super().__init__(config=config)
 
     def predict(self, sc: Scenario, initial_time_step: int = 0) -> Scenario:
-        print()
         pred_sc = copy.deepcopy(sc)
 
         for idx, dyno in enumerate(sc.dynamic_obstacles):
             trajectory: Trajectory = dyno.prediction.trajectory
+            # state_list: list[State] = trajectory.state_list
             pred_state_list: list[State] = copy.deepcopy(trajectory.state_list[: self._config.num_steps_prediction])
 
             dt = self._config.dt
@@ -96,31 +93,32 @@ class ConstantAccelerationCurvilinearPredictor(PredictorInterface):
             a_0: float = dyno.initial_state.acceleration
             pos_0: np.ndarray = dyno.initial_state.position
             orientation_0: float = dyno.initial_state.orientation
+            yaw_rate_0: float = dyno.initial_state.yaw_rate
 
             merged_lanelets, merged_lanelets_id = get_merged_laneletes_from_position(sc.lanelet_network, pos_0)
 
             # reference_trajectory: np.ndarray = merged_lanelets[0].center_vertices  # (n, 2)
             curvilinear_cosy: CurvilinearCoordinateSystem = create_cosy_from_lanelet(merged_lanelets[0])
-
             curvilinear_pos: tuple[float, float] = curvilinear_cosy.convert_to_curvilinear_coords(pos_0[0], pos_0[1])
             pos_lon, pos_lat = curvilinear_pos
 
+            # Initialization
             ccosy_orientation = get_orientation_at_position(curvilinear_cosy, pos_0)
-            orientation_diff = orientation_0 - ccosy_orientation
-
-            a_lon_0: float = a_0 * np.cos(orientation_diff)
-            a_lat_0: float = a_0 * np.sin(orientation_diff)
-
-            v_lon: float = v_0 * np.cos(orientation_diff)
-            v_lat: float = v_0 * np.sin(orientation_diff)
+            orientation_diff = orientation_0 - ccosy_orientation  # yaw
+            v_lon = v_0 * np.cos(orientation_diff)
+            v_lat = v_0 * np.sin(orientation_diff)
 
             for t in range(initial_time_step, initial_time_step + self._config.num_steps_prediction):
                 if t >= (len(pred_state_list)):
                     break
-                pos_lon = pos_lon + v_lon * dt + a_lon_0 * 0.5 * dt ** 2
-                pos_lat = pos_lat + v_lat * dt + a_lat_0 * 0.5 * dt **2
-                v_lon = v_lon + a_lon_0 * dt
-                v_lat = v_lat + a_lat_0 * dt
+                # Prediction
+                pos_lon = pos_lon + np.cos(orientation_diff) * (v_lon + 0.5 * a_0 * dt) * dt
+                pos_lat = pos_lat + v_lat * dt
+
+                orientation_diff = orientation_diff + yaw_rate_0 * dt
+
+                v_lon = v_0 * np.cos(orientation_diff) + a_0 * dt
+                v_lat = v_0 * np.sin(orientation_diff)
 
                 # Get the cartesian positions, etc.
                 pred_pos = curvilinear_cosy.convert_to_cartesian_coords(pos_lon, pos_lat)
@@ -129,10 +127,11 @@ class ConstantAccelerationCurvilinearPredictor(PredictorInterface):
 
                 pred_state_list[t].position = pred_pos
                 pred_state_list[t].orientation = pred_orientation
-                pred_state_list[t].velocity = np.sqrt(v_lon**2 + v_lat**2)
-                pred_state_list[t].acceleration = a_0
+                pred_state_list[t].velocity = v_0
+                pred_state_list[t].acceleration = 0
 
             pred_trajectory = Trajectory(pred_state_list[0].time_step, pred_state_list)
             pred_sc.dynamic_obstacles[idx].prediction.trajectory = pred_trajectory
 
         return pred_sc
+

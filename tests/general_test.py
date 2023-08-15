@@ -4,12 +4,15 @@ from statistics import mean
 from typing import Dict, List, Type
 
 from commonroad.scenario.scenario import Scenario
-from test_utilities import calc_difference, cost_function, get_scenarios_from_files, shorten_scenario_trajectory
+from test_utilities import (calc_difference, cost_function,
+                            get_scenarios_from_files,
+                            shorten_scenario_trajectory)
 
 from crpred.advanced_models.idm_predictor import IDMPredictor
-from crpred.basic_models.constant_velocity_predictor import ConstantVelocityLinearPredictor
-from crpred.basic_models.constant_acceleration_predictor import ConstantAccelerationLinearPredictor
-
+from crpred.basic_models.constant_acceleration_predictor import \
+    ConstantAccelerationLinearPredictor, ConstantAccelerationCurvilinearPredictor
+from crpred.basic_models.constant_velocity_predictor import  \
+    ConstantVelocityCurvilinearPredictor, ConstantVelocityLinearPredictor
 # from crpred.advanced_models.mobil_predictor import MOBILPredictor
 from crpred.ground_truth_predictor import GroundTruthPredictor
 from crpred.predictor_interface import PredictorInterface
@@ -30,21 +33,22 @@ def trajectory_prediction_test(
     :param details: Should details be printed
     :param visualize: Should the solutions be visualized
     """
-    scenarios = get_scenarios_from_files(1, Path("scenarios"))
+    scenarios = get_scenarios_from_files(3, Path("scenarios"))
 
     # set path to configurations and get configuration object
     configs = [PredictorParams()]
 
     for sc in scenarios:
+        print(f"\n### Scenario: {sc.scenario_id}")
         new_sc = copy.deepcopy(sc)
         plotted_ground_truth = False
 
         for future_states in future_states_range:
             for predictor_cls in predictor_clss:
-                all_distances = []
+                all_config_distances = []
 
                 for config in configs:
-                    print(f"\n### Testing {predictor_cls.__name__} with {future_states} future states.")
+                    print(f"### Testing {predictor_cls.__name__} with {future_states} future states.")
                     config.num_steps_prediction = future_states
 
                     ground_truth_predictor = GroundTruthPredictor(config)
@@ -59,7 +63,7 @@ def trajectory_prediction_test(
                     obstacle_distances: Dict[int, Dict[int, float]] = calc_difference(ground_truth, prediction)
 
                     cost = cost_function(obstacle_distances)
-                    all_distances.append(cost)
+                    all_config_distances.append(cost)
 
                     if visualize:
                         output_dir = Path(f"output/{str(sc.scenario_id)}")
@@ -92,13 +96,16 @@ def trajectory_prediction_test(
                     if details:
                         print(f"{new_sc.scenario_id}: {cost}")
 
-                print(f"Over all mean distance for {predictor_cls.__name__}: {mean(all_distances)}")
+                if len(all_config_distances) > 1:
+                    print(f"Over all mean distance for {predictor_cls.__name__}: {mean(all_config_distances)}")
 
 
 if __name__ == "__main__":
     predictors: List[Type[PredictorInterface]] = [
-        ConstantVelocityLinearPredictor,
-        ConstantAccelerationLinearPredictor,
+        # ConstantVelocityLinearPredictor,
+        ConstantVelocityCurvilinearPredictor,
+        # ConstantAccelerationLinearPredictor,
+        ConstantAccelerationCurvilinearPredictor,
         # MOBILPredictor,
     ]
     trajectory_prediction_test(predictors, list(range(50, 51)), True, True)

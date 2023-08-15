@@ -229,3 +229,5 @@ build/
 /dist/
 /output
 /tests/output
+
+notes.md
