@@ -1,30 +1,29 @@
 import copy
+from commonroad.scenario.scenario import Scenario
 from pathlib import Path
 from statistics import mean
 from typing import Dict, List, Type
 
-from commonroad.scenario.scenario import Scenario
-from test_utilities import (calc_difference, cost_function,
-                            get_scenarios_from_files,
-                            shorten_scenario_trajectory)
-
 from crpred.advanced_models.idm_predictor import IDMPredictor
 from crpred.basic_models.constant_acceleration_predictor import \
     ConstantAccelerationLinearPredictor, ConstantAccelerationCurvilinearPredictor
-from crpred.basic_models.constant_velocity_predictor import  \
+from crpred.basic_models.constant_velocity_predictor import \
     ConstantVelocityCurvilinearPredictor, ConstantVelocityLinearPredictor
 # from crpred.advanced_models.mobil_predictor import MOBILPredictor
 from crpred.ground_truth_predictor import GroundTruthPredictor
 from crpred.predictor_interface import PredictorInterface
 from crpred.utility.config import PredictorParams
 from crpred.utility.visualization import plot_scenario
+from utilities import (calc_difference, cost_function,
+                       get_scenarios_from_files,
+                       shorten_scenario_trajectory)
 
 
 def trajectory_prediction_test(
-    predictor_clss: List[Type[PredictorInterface]],
-    future_states_range: List[int],
-    details: bool = False,
-    visualize: bool = False,
+        predictor_clss: List[Type[PredictorInterface]],
+        future_states_range: List[int],
+        details: bool = False,
+        visualize: bool = False,
 ):
     """
     :param predictor_clss: A list of predictor classes that should be tested

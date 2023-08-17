@@ -8,6 +8,7 @@ from commonroad.scenario.trajectory import Trajectory
 from commonroad_dc.costs.route_matcher import create_cosy_from_lanelet, get_orientation_at_position
 from commonroad_dc.geometry.util import compute_orientation_from_polyline, compute_pathlength_from_polyline
 from commonroad_dc.pycrccosy import CurvilinearCoordinateSystem
+from typing import List, Tuple
 
 from crpred.predictor_interface import PredictorInterface
 from crpred.utility.config import PredictorParams
@@ -24,7 +25,7 @@ class ConstantVelocityLinearPredictor(PredictorInterface):
         for idx, dyno in enumerate(sc.dynamic_obstacles):
             trajectory: Trajectory = dyno.prediction.trajectory
             # state_list: list[State] = trajectory.state_list
-            pred_state_list: list[State] = copy.deepcopy(trajectory.state_list[: self._config.num_steps_prediction])
+            pred_state_list: List[State] = copy.deepcopy(trajectory.state_list[: self._config.num_steps_prediction])
 
             dt = self._config.dt
             if sc.dt != dt:
@@ -38,7 +39,7 @@ class ConstantVelocityLinearPredictor(PredictorInterface):
 
             # reference_trajectory: np.ndarray = merged_lanelets[0].center_vertices  # (n, 2)
             curvilinear_cosy: CurvilinearCoordinateSystem = create_cosy_from_lanelet(merged_lanelets[0])
-            curvilinear_pos: tuple[float, float] = curvilinear_cosy.convert_to_curvilinear_coords(pos_0[0], pos_0[1])
+            curvilinear_pos: Tuple[float, float] = curvilinear_cosy.convert_to_curvilinear_coords(pos_0[0], pos_0[1])
             pos_lon, pos_lat = curvilinear_pos
 
             ccosy_orientation = get_orientation_at_position(curvilinear_cosy, pos_0)

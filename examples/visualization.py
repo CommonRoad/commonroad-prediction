@@ -7,7 +7,7 @@ from crpred.basic_models.constant_velocity_predictor import ConstantVelocityLine
 from crpred.predictor_interface import PredictorInterface
 from crpred.utility.config import PredictorParams
 from crpred.utility.visualization import visualize_prediction
-from tests.test_utilities import get_scenarios_from_files
+from examples.utilities import get_scenarios_from_files
 
 
 def main():
