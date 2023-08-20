@@ -23,6 +23,7 @@ class ConstantVelocityLinearPredictor(PredictorInterface):
         pred_sc = copy.deepcopy(sc)
 
         for idx, dyno in enumerate(sc.dynamic_obstacles):
+            # TODO: rewrite this part to not rely on TrajectoryPrediction
             trajectory: Trajectory = dyno.prediction.trajectory
             # state_list: list[State] = trajectory.state_list
             pred_state_list: List[State] = copy.deepcopy(trajectory.state_list[: self._config.num_steps_prediction])
