@@ -56,9 +56,6 @@ def trajectory_prediction_test(
                     predictor: PredictorInterface = predictor_cls(config)
                     prediction: Scenario = predictor.predict(new_sc)
 
-                    original_position = ground_truth.dynamic_obstacles[0].prediction.trajectory.state_list[0].position
-                    predicted_position = prediction.dynamic_obstacles[0].prediction.trajectory.state_list[0].position
-
                     obstacle_distances: Dict[int, Dict[int, float]] = calc_difference(ground_truth, prediction)
 
                     cost = cost_function(obstacle_distances)
@@ -66,7 +63,6 @@ def trajectory_prediction_test(
 
                     if visualize:
                         output_dir = Path(f"output/{str(sc.scenario_id)}")
-                        # Plot the prediction
                         plot_scenario(
                             prediction,
                             step_end=config.num_steps_prediction,
@@ -76,7 +72,6 @@ def trajectory_prediction_test(
                             save_gif=True,
                             path_output=output_dir.joinpath(predictor_cls.__name__),
                         )
-                        # Plot the ground truth
 
                         if not plotted_ground_truth:
                             plot_scenario(
@@ -89,8 +84,6 @@ def trajectory_prediction_test(
                                 path_output=output_dir.joinpath("ground_truth"),
                             )
                             plotted_ground_truth = True
-                        # predictor.visualize(new_sc)
-                        # ground_truth_predictor.visualize(sc)
 
                     if details:
                         print(f"{new_sc.scenario_id}: {cost}")
@@ -103,8 +96,8 @@ if __name__ == "__main__":
     predictors: List[Type[PredictorInterface]] = [
         ConstantVelocityLinearPredictor,
         ConstantVelocityCurvilinearPredictor,
-        # ConstantAccelerationLinearPredictor,
-        # ConstantAccelerationCurvilinearPredictor,
+        ConstantAccelerationLinearPredictor,
+        ConstantAccelerationCurvilinearPredictor,
         # MOBILPredictor,
     ]
-    trajectory_prediction_test(predictors, list(range(50, 51)), True, True)
+    trajectory_prediction_test(predictors, list(range(50, 51)), True, False)

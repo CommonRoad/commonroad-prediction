@@ -2,7 +2,6 @@ import copy
 from dataclasses import dataclass
 from typing import Tuple, List
 
-import numpy as np
 from commonroad.scenario.scenario import Scenario
 from commonroad.scenario.state import CustomState, InitialState
 from commonroad.scenario.trajectory import Trajectory
@@ -52,31 +51,28 @@ class MotionModelPredictor(PredictorInterface):
                 if self._config.num_steps_prediction <= steps_in_scenario \
                 else steps_in_scenario
 
-            # Extract the initial values
             initial_state: InitialState = dyno.initial_state
-            v_0: float = initial_state.velocity
-            pos_0: np.ndarray = initial_state.position
-            orientation_0: float = initial_state.orientation
-            acceleration_0: float = initial_state.acceleration
-            yaw_rate_0: float = initial_state.yaw_rate
 
             # Calculate the curvilinear coordinates
-            merged_lanelets, merged_lanelets_id = get_merged_laneletes_from_position(sc.lanelet_network, pos_0)
+            merged_lanelets, merged_lanelets_id = get_merged_laneletes_from_position(
+                sc.lanelet_network, initial_state.position)
             curvilinear_cosy: CurvilinearCoordinateSystem = create_cosy_from_lanelet(merged_lanelets[0])
-            curvilinear_pos: Tuple[float, float] = curvilinear_cosy.convert_to_curvilinear_coords(pos_0[0], pos_0[1])
+
+            curvilinear_pos: Tuple[float, float] = curvilinear_cosy.convert_to_curvilinear_coords(
+                initial_state.position[0], initial_state.position[1])
             pos_lon, pos_lat = curvilinear_pos
 
             # Calculate the orientation in the curvilinear coordinate system
-            ccosy_orientation = get_orientation_at_position(curvilinear_cosy, pos_0)
-            orientation_diff = orientation_0 - ccosy_orientation
+            ccosy_orientation = get_orientation_at_position(curvilinear_cosy, initial_state.position)
+            orientation_diff = initial_state.orientation - ccosy_orientation
 
             initial_state_values = InitialStateValues(
                 p_lon=pos_lon,
                 p_lat=pos_lat,
-                v=v_0,
+                v=initial_state.velocity,
                 orientation_in_ccosy=orientation_diff,
-                acceleration=acceleration_0,
-                yaw_rate=yaw_rate_0,
+                acceleration=initial_state.acceleration,
+                yaw_rate=initial_state.yaw_rate,
             )
 
             pred_state_list = self._predict_states(
