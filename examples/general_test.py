@@ -35,7 +35,7 @@ def trajectory_prediction_test(
     scenarios = get_scenarios_from_files(3, Path("scenarios"))
 
     # set path to configurations and get configuration object
-    configs = [PredictorParams()]
+    configs = [PredictorParams(num_steps_prediction=60)]
 
     for sc in scenarios:
         print(f"\n### Scenario: {sc.scenario_id}")
@@ -70,7 +70,7 @@ def trajectory_prediction_test(
                         plot_scenario(
                             prediction,
                             step_end=config.num_steps_prediction,
-                            predictor_type=predictor,
+                            predictor_type=predictor.__str__(),
                             plot_occupancies=True,
                             save_plots=True,
                             save_gif=True,
@@ -82,7 +82,7 @@ def trajectory_prediction_test(
                             plot_scenario(
                                 ground_truth,
                                 step_end=config.num_steps_prediction,
-                                predictor_type=ground_truth_predictor,
+                                predictor_type=ground_truth_predictor.__str__(),
                                 plot_occupancies=True,
                                 save_plots=True,
                                 save_gif=True,
@@ -96,15 +96,15 @@ def trajectory_prediction_test(
                         print(f"{new_sc.scenario_id}: {cost}")
 
                 if len(all_config_distances) > 1:
-                    print(f"Over all mean distance for {predictor_cls.__name__}: {mean(all_config_distances)}")
+                    print(f"Overall mean distance for {predictor_cls.__name__}: {mean(all_config_distances)}")
 
 
 if __name__ == "__main__":
     predictors: List[Type[PredictorInterface]] = [
-        # ConstantVelocityLinearPredictor,
+        ConstantVelocityLinearPredictor,
         ConstantVelocityCurvilinearPredictor,
         # ConstantAccelerationLinearPredictor,
-        ConstantAccelerationCurvilinearPredictor,
+        # ConstantAccelerationCurvilinearPredictor,
         # MOBILPredictor,
     ]
     trajectory_prediction_test(predictors, list(range(50, 51)), True, True)
