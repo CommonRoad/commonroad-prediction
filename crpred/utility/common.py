@@ -26,7 +26,7 @@ def clear_obstacle_trajectory(sc: Scenario, initial_time_step: int = 0):
 
 def get_merged_laneletes_from_position(lanelet_network: LaneletNetwork, position: np.ndarray):
     lanelet_id_list = lanelet_network.find_lanelet_by_position([position])
-    if not lanelet_id_list:
+    if not any(lanelet_id_list):
         raise ValueError(f"Position {position} cannot be assigned to a lanelet.")
 
     current_lanelet = lanelet_network.find_lanelet_by_id(lanelet_id_list[0][0])

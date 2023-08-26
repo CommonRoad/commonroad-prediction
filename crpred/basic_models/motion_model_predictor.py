@@ -2,6 +2,7 @@ import copy
 from dataclasses import dataclass
 from typing import Tuple, List
 
+from commonroad.prediction.prediction import Prediction, Occupancy
 from commonroad.scenario.scenario import Scenario
 from commonroad.scenario.state import CustomState, InitialState
 from commonroad.scenario.trajectory import Trajectory
@@ -46,12 +47,22 @@ class MotionModelPredictor(PredictorInterface):
             print(f"Warning: dt from config ({dt}) is not the same as dt from the scenario ({sc.dt})")
 
         for idx, dyno in enumerate(sc.dynamic_obstacles):
-            steps_in_scenario = len(dyno.prediction.trajectory.state_list)
-            steps_to_predict = self._config.num_steps_prediction \
-                if self._config.num_steps_prediction <= steps_in_scenario \
-                else steps_in_scenario
+            if dyno.prediction:
+                steps_in_scenario = len(dyno.prediction.trajectory.state_list)
+                steps_to_predict = self._config.num_steps_prediction \
+                    if self._config.num_steps_prediction <= steps_in_scenario \
+                    else steps_in_scenario
+            else:
+                steps_to_predict = self._config.num_steps_prediction
 
             initial_state: InitialState = dyno.initial_state
+
+            # Maybe move these checks into the child classes to make them model-specific
+            assert initial_state.velocity is not None
+            assert initial_state.acceleration is not None
+            assert initial_state.yaw_rate is not None
+            assert initial_state.position is not None
+            assert initial_state.orientation is not None
 
             # Calculate the curvilinear coordinates
             merged_lanelets, merged_lanelets_id = get_merged_laneletes_from_position(
@@ -84,6 +95,15 @@ class MotionModelPredictor(PredictorInterface):
             assert len(pred_state_list) == steps_to_predict
 
             pred_trajectory = Trajectory(initial_time_step, pred_state_list)
+
+            # Check if a prediction object exists in the dynamic obstacle
+            if not pred_sc.dynamic_obstacles[idx].prediction:
+                pred_sc.dynamic_obstacles[idx].prediction = Prediction(
+                    initial_time_step=initial_time_step,
+                    occupancy_set=[Occupancy(i, dyno.obstacle_shape) for i in
+                                   range(initial_time_step, initial_time_step + steps_to_predict)]
+                )
+
             pred_sc.dynamic_obstacles[idx].prediction.trajectory = pred_trajectory
 
         return pred_sc
