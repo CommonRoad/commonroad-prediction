@@ -8,7 +8,7 @@ from crpred.utility.config import PredictorParams
 from tests.basic_models.base_class import MotionModelPredictorTest
 
 
-class TestConstantVelocityLinearPredictor(MotionModelPredictorTest):
+class TestConstantVelocityCurvilinearPredictor(MotionModelPredictorTest):
     def setup_class(self):
         self.test_config = PredictorParams(num_steps_prediction=50)
         self.predictor = ConstantVelocityCurvilinearPredictor(config=self.test_config)
@@ -42,20 +42,17 @@ class TestConstantVelocityLinearPredictor(MotionModelPredictorTest):
 
     def test_prediction_const_yaw_rate(self):
         yaw_rate = 0.1
-        velocity = 10.0
-        scenario = test_utils.create_const_yaw_rate_straight_scenario(yaw_rate, velocity)
+        scenario = test_utils.create_const_yaw_rate_straight_scenario(yaw_rate)
         pred_sc = self.predictor.predict(scenario)
         dyno = pred_sc.dynamic_obstacles[0]
 
         for i, state in enumerate(dyno.prediction.trajectory.state_list):
-            assert state.velocity == 10.0
+            assert state.velocity == 0.0
             assert state.orientation == pytest.approx((i + 1) * yaw_rate * scenario.dt, 0.001)
+            assert state.yaw_rate == 0.1
 
-        final_state = dyno.initial_state.__getattribute__(
-            "position") + self.test_config.num_steps_prediction * scenario.dt * np.array([velocity, 0])
-        # The final state should deviate from the straight line prediction (todo: calculate exact values)
-        np.testing.assert_raises(AssertionError, np.testing.assert_array_equal,
-                                 dyno.prediction.trajectory.state_list[-1].position, final_state)
+        final_state = dyno.initial_state.__getattribute__("position")
+        np.testing.assert_array_equal(dyno.prediction.trajectory.state_list[-1].position, final_state)
 
 
 # Run the tests

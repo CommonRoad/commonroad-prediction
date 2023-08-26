@@ -45,11 +45,11 @@ def create_const_acceleration_straight_scenario(acceleration: float) -> Scenario
     ))
 
 
-def create_const_yaw_rate_straight_scenario(yaw_rate: float, velocity: float) -> Scenario:
+def create_const_yaw_rate_straight_scenario(yaw_rate: float) -> Scenario:
     return create_straight_scenario(initial_state=InitialState(
         position=np.array([0.0, 0.0]),
         orientation=0.0,
-        velocity=velocity,
+        velocity=0.0,
         acceleration=0.0,
         yaw_rate=yaw_rate,
         time_step=0
