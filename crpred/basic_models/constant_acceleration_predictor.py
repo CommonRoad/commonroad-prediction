@@ -65,7 +65,7 @@ class ConstantAccelerationCurvilinearPredictor(MotionModelPredictor):
             p_lat = p_lat + v_lat * dt
 
             orientation_in_ccosy = orientation_in_ccosy + initial_values.yaw_rate * dt
-            prev_state_v = np.sqrt(v_lon**2 + v_lat**2)
+            prev_state_v = np.sqrt(v_lon ** 2 + v_lat ** 2)
             v_lon = prev_state_v * np.cos(orientation_in_ccosy) + initial_values.acceleration * dt
             v_lat = prev_state_v * np.sin(orientation_in_ccosy)
 

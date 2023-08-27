@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-from commonroad.scenario.state import InitialState
 
 import tests.utilities as test_utils
 from crpred.basic_models.constant_velocity_predictor import ConstantVelocityCurvilinearPredictor
