@@ -1,8 +1,7 @@
 [tool.poetry]
 name = "commonroad-prediction"
 version = "0.1.0"
-description = "Collection and interface of CommonRoad prediction algorithms."
-readme = "README.md"
+description = "A collection and interface for CommonRoad prediction algorithms."
 authors = ["Cyber-Physical Systems Group, Technical University of Munich <commonroad@lists.lrz.de>"]
 license = "BSD"
 homepage = "https://commonroad.in.tum.de"
@@ -17,19 +16,14 @@ classifiers = [
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows"
 ]
+readme = "README.md"
 packages = [{include = "crpred"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
 commonroad-io = ">=2023.2"
-commonroad-drivability-checker = "^2023.1"
 imageio = "^2.31.1"
 
-[tool.poetry.group.tests]
-optional = true
-
-[tool.poetry.group.tests.dependencies]
-prospector = {extras = ["with-mypy"], version = "^1.9.0"}
 
 [build-system]
 requires = ["poetry-core"]

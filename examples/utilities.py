@@ -1,38 +1,15 @@
-import copy
-import os
 from copy import deepcopy
 import random
-from typing import Tuple, Dict, List, Type, Optional
 from math import sqrt
-from numpy import ndarray
-from statistics import median, mean
-from random import sample
 from pathlib import Path
+from statistics import median, mean
+from typing import Tuple, Dict, List, Optional
 
+from commonroad.common.file_reader import CommonRoadFileReader
 from commonroad.scenario.scenario import Scenario
 from commonroad.scenario.state import State
-from commonroad.common.file_reader import CommonRoadFileReader
 from commonroad.scenario.trajectory import Trajectory
-
-from crpred.predictor_interface import PredictorInterface
-from crpred.advanced_models.idm_predictor import IDMPredictor
-# from crpred.advanced_models.mobil_predictor import MOBILPredictor
-from crpred.ground_truth_predictor import GroundTruthPredictor
-from crpred.utility.config import PredictorParams
-from crpred.utility.common import clear_obstacle_trajectory
-
-
-def shorten_scenario_trajectory(original_scenario: Scenario, remaining_steps: int) -> Optional[Scenario]:
-    """
-    Shorten the given scenario. Remove all steps after n remaining_steps
-    """
-    s: Scenario = deepcopy(original_scenario)
-
-    for obstacle in s.dynamic_obstacles:
-        short_state_list: List[State] = obstacle.prediction.trajectory.state_list[:remaining_steps]
-        obstacle.prediction.trajectory.state_list = short_state_list
-
-    return s
+from numpy import ndarray
 
 
 def get_scenarios_from_files(n: int, scenario_dir: Path = None):
@@ -57,7 +34,7 @@ def get_scenarios_from_files(n: int, scenario_dir: Path = None):
     return random.sample(result, n)
 
 
-def calc_difference(s: Scenario, p: Scenario) -> Dict[int, Dict[int, float]]:
+def calc_scenario_difference(s: Scenario, p: Scenario) -> Dict[int, Dict[int, float]]:
     """
     Calculate the distance between the predicted and the Original Trajectory
     @returns The distance between every common time step for all dynamic obstacles
