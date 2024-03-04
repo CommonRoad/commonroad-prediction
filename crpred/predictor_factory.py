@@ -1,12 +1,12 @@
-from typing import Optional, Dict, List
+from typing import Dict, List, Optional
 
 from commonroad.scenario.obstacle import State
 
-from crpred.utility.config import PredictorType, PredictorParams
-from crpred.predictor_interface import PredictorInterface
 from crpred.advanced_models.idm_predictor import IDMPredictor
 from crpred.advanced_models.mobil_predictor import MOBILPredictor
 from crpred.ground_truth_predictor import GroundTruthPredictor
+from crpred.predictor_interface import PredictorInterface
+from crpred.utility.config import PredictorParams, PredictorType
 
 
 class PredictorFactory:
@@ -15,12 +15,13 @@ class PredictorFactory:
     dict_predictors = {
         PredictorType.IDM: IDMPredictor,
         PredictorType.MOBIL: MOBILPredictor,
-        PredictorType.GROUND_TRUTH: GroundTruthPredictor
+        PredictorType.GROUND_TRUTH: GroundTruthPredictor,
     }
 
     @staticmethod
-    def create_predictor(config: PredictorParams, previous_states: Optional[Dict[int, List[State]]] = None) \
-            -> PredictorInterface:
+    def create_predictor(
+        config: PredictorParams, previous_states: Optional[Dict[int, List[State]]] = None
+    ) -> PredictorInterface:
         """
         Creates predictor.
 

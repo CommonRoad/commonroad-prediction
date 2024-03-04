@@ -1,9 +1,10 @@
 import dataclasses
 import inspect
-from enum import Enum
-from dataclasses import dataclass, field
 import pathlib
-from typing import Dict, Union, Any, List
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any, Dict, List, Union
+
 from omegaconf import OmegaConf
 
 
@@ -105,7 +106,7 @@ class BaseParam:
             raise KeyError(f"{key} is not a parameter of {self.__class__.__name__}") from e
 
     @classmethod
-    def load(cls, file_path: Union[pathlib.Path, str], validate_types: bool = True) -> 'BaseParam':
+    def load(cls, file_path: Union[pathlib.Path, str], validate_types: bool = True) -> "BaseParam":
         """
         Loads config file and creates parameter class.
 
@@ -128,9 +129,20 @@ class BaseParam:
         :param file_path: Path where yaml file should be stored.
         """
         # Avoid saving private attributes
-        dict_cfg = dataclasses.asdict(self, dict_factory=lambda items: {key: val for key, val in items if
-                                                                        not key.startswith("_")})
+        dict_cfg = dataclasses.asdict(
+            self, dict_factory=lambda items: {key: val for key, val in items if not key.startswith("_")}
+        )
         OmegaConf.save(OmegaConf.create(dict_cfg), file_path, resolve=True)
+
+
+# @dataclass
+# class ConstantVelocityLinearParams(BaseParam):
+#     v: float = 20.0
+
+
+# @dataclass
+# class ConstantAccelerationLinearParams(BaseParam):
+#     a: float = 1.0
 
 
 @dataclass

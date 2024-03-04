@@ -1,4 +1,5 @@
 from abc import ABC
+
 from commonroad.scenario.scenario import Scenario
 
 from crpred.utility.config import PredictorParams
@@ -24,7 +25,7 @@ class PredictorInterface(ABC):
         :return: CommonRoad scenario containing predictions.
         """
 
-    def visualize(self, sc: Scenario):
-        """Visualize the prediction."""
-        plot_scenario(sc, step_end=self._config.num_steps_prediction, predictor_type=self.predictor,
-                      plot_occupancies=True)
+    # def visualize(self, sc: Scenario, save_plots: bool = True):
+    #     """Visualize the prediction."""
+    #     plot_scenario(sc, step_end=self._config.num_steps_prediction, predictor_type=self.predictor,
+    #                   plot_occupancies=True, save_plots=save_plots)
