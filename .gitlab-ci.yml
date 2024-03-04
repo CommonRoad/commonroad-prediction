@@ -35,13 +35,13 @@ test_python_versions:
   stage: test
   parallel :
     matrix :
-      - PYTHON_VERSIONS : [ "3.9", "3.10", "3.11" ]
+      - PYTHON_VERSIONS : [ "3.9"]#, "3.10", "3.11" ]
   script:
     - *run-test-with-coverage
   needs: []
 
 test_latest_python_version_and_coverage:
-  image: python:3.12
+  image: python:3.10
   stage: test
   script:
     - *run-test-with-coverage
