@@ -1,8 +1,6 @@
 # CommonRoad-Prediction
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/commonroad-prediction.svg)](https://pypi.python.org/pypi/commonroad-prediction/)  
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
-![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
-![macOS](https://img.shields.io/badge/mac%20os-000000?style=for-the-badge&logo=macos&logoColor=F0F0F0)  
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)  
 [![PyPI version fury.io](https://badge.fury.io/py/commonroad-prediction.svg)](https://pypi.python.org/pypi/commonroad-prediction/)
 [![PyPI download month](https://img.shields.io/pypi/dm/commonroad-prediction.svg?label=PyPI%20downloads)](https://pypi.python.org/pypi/commonroad-prediction/) 
 [![PyPI download week](https://img.shields.io/pypi/dw/commonroad-prediction.svg?label=PyPI%20downloads)](https://pypi.python.org/pypi/commonroad-prediction/)   
