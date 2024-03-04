@@ -1,9 +1,9 @@
+from commonroad.scenario.scenario import Scenario
+
 from crpred.advanced_models.agent_predictor import AgentPredictor
 from crpred.advanced_models.idm_agent import IDMAgent
-from crpred.utility import visualization as util_visualization
-from crpred.utility.config import PredictorParams
 from crpred.utility.common import clear_obstacle_trajectory
-from commonroad.scenario.scenario import Scenario
+from crpred.utility.config import PredictorParams
 
 
 class IDMPredictor(AgentPredictor):

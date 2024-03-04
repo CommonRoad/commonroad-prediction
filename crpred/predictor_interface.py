@@ -1,8 +1,8 @@
 from abc import ABC
+
 from commonroad.scenario.scenario import Scenario
 
 from crpred.utility.config import PredictorParams
-from crpred.utility.visualization import plot_scenario
 
 
 class PredictorInterface(ABC):

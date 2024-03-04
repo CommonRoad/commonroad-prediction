@@ -231,3 +231,6 @@ build/
 /examples/output
 
 notes.md
+/site/
+/tutorials/output/
+/tutorials/plots/

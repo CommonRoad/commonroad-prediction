@@ -1,124 +1,107 @@
-image: python:3.10
-
 stages:
-  - static_check
+  - style_check
   - test
   - build
+  - deploy
 
-before_script:
-  - pip install poetry
-  - poetry config installer.modern-installation false # this should be removed in the future, required because of invalid third-party wheels (https://github.com/python-poetry/poetry/issues/7686)
-  - poetry config virtualenvs.in-project true
-  - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.lrz.de/".insteadOf "git@gitlab.lrz.de:"
-  - poetry install --with examples
-  - source .venv/bin/activate
+default:
+  image: python:3.10
+  before_script:
+    - apt-get update && apt-get install -y cmake build-essential git pkg-config ca-certificates wget libomp-dev libeigen3-dev libboost-all-dev uuid-dev libcgal-dev
+    - pip install poetry
+    - poetry config virtualenvs.in-project true
+    - poetry install --with docs,dev,tests,tutorials
+    - source .venv/bin/activate
 
-#.run-test-with-coverage: &run-test-with-coverage
-#  - apt-get update && apt-get install -y ffmpeg
-#  - coverage run examples/run_tests.py
-#  - coverage report -m || true
+.run-test-with-coverage: &run-test-with-coverage
+  - coverage run --source crpred -m pytest
+  - coverage report -m || true
 
 # static_check
-prospector_source:
-  stage: static_check
-  image: python:3.10
+formatting_check:
+  stage: style_check
   script:
-    - python -m pip install prospector[with_mypy]
-    - prospector crpred/
+    - black --check .
+    - isort --check-only .
 
-#build_and_test_python_3_8:
-#  image: python:3.8
-#  stage: test
-#  script:
-#    - *run-test-with-coverage
-#
-#build_and_test_python_3_9:
-#  image: python:3.9
-#  stage: test
-#  script:
-#    - *run-test-with-coverage
-#
-#build_and_test_python_3_10:
-#  image: python:3.10
-#  stage: test
-#  script:
-#    - *run-test-with-coverage
-#
-#build_and_test_python_3_11:
-#  image: python:3.11
-#  stage: test
-#  script:
-#    - *run-test-with-coverage
-#    - coverage xml
-#  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
-#  artifacts:
-#    reports:
-#      coverage_report:
-#        coverage_format: cobertura
-#        path: coverage.xml
-#
-#build_doc:
-#  stage: test
-#  script:
-#    - apt-get update && apt-get install -y graphviz
-#    - poetry install --with docs
-#    - cd doc && make html SPHINXOPTS="-W"
-#  artifacts:
-#    paths:
-#      - ./doc/build/
-#    expose_as: 'Documentation'
-#
-#validate_tutorials:
-#  stage: test
-#  script:
-#    - poetry install --with tutorials
-#    - pytest --nbval-lax ./tutorials/
-#
-#pages:
-#  # Push the latest documentation of the development branch to the GitLab Pages
-#  # at https://cps.pages.gitlab.lrz.de/commonroad-io/
-#  stage: deploy
-#  script:
-#    - apt-get update && apt-get install -y graphviz
-#    - poetry install --with docs
-#    - cd doc/source && sphinx-build -b html . ../../public
-#  artifacts:
-#    paths:
-#      - public
-#  environment:
-#    name: Gitlab Pages
-#    url: https://cps.pages.gitlab.lrz.de/commonroad-io/
-#  only:
-#    - develop
-#
-#push_to_internal_pipy_registry:
-#  # push the development version to the internal pipy registry https://gitlab.lrz.de/cps/commonroad-io/-/packages
-#  # before manually triggering the job, delete the previous package in case the version number didn't change
-#  stage: deploy
-#  when: manual
-#  only:
-#    - develop
-#  script:
-#    - poetry config repositories.gitlab ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi
-#    - poetry build
-#    - poetry publish --repository gitlab -u gitlab-ci-token -p ${CI_JOB_TOKEN}
-#
-#push_to_external_pipy_test_registry:
-#  stage: deploy
-#  when: manual
-#  only:
-#    - master
-#  script:
-#    - poetry config repositories.test https://test.pypi.org/legacy/
-#    - poetry build
-#    - poetry publish --repository test -u ${CR_PYPI_TEST_USERNAME} -p ${CR_PYPI_TEST_PASSWORD}
-#
-#push_to_external_pipy_release_registry:
-#  stage: deploy
-#  when: manual
-#  only:
-#    - master
-#  script:
-#    - poetry build
-#    - poetry publish -u ${CR_PYPI_RELEASE_USERNAME} -p ${CR_PYPI_RELEASE_PASSWORD}
+lint_flake8:
+  stage: style_check
+  script:
+    - pip install "flake8~=6.1.0"
+    - flake8 ./tests ./crpred ./docs ./tutorials
 
+test_python_versions:
+  image : python:$PYTHON_VERSIONS
+  stage: test
+  parallel :
+    matrix :
+      - PYTHON_VERSIONS : [ "3.9", "3.10", "3.11" ]
+  script:
+    - *run-test-with-coverage
+  needs: []
+
+test_latest_python_version_and_coverage:
+  image: python:3.12
+  stage: test
+  script:
+    - *run-test-with-coverage
+    - coverage xml
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+pages:
+  stage: deploy
+  when: manual
+  publish: site
+  only :
+    - main
+  script:
+    - mkdocs build
+  artifacts:
+    paths:
+      - site
+  environment:
+    name: Gitlab Pages
+    url: https://cps.pages.gitlab.lrz.de/commonroad/commonroad-prediction/
+
+build_pages:
+  stage: deploy
+  script:
+    - mkdocs build
+  artifacts:
+    paths:
+      - site
+  needs: []
+
+push_to_internal_pipy_registry:
+  stage: deploy
+  when: manual
+  only:
+    - develop
+  script:
+    - poetry config repositories.gitlab ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi
+    - poetry build
+    - poetry publish --repository gitlab -u gitlab-ci-token -p ${CI_JOB_TOKEN}
+
+push_to_external_pipy_test_registry:
+  stage: deploy
+  when: manual
+  only:
+    - main
+  script:
+    - poetry config repositories.test https://test.pypi.org/legacy/
+    - poetry build
+    - poetry publish --repository test -u __token__ -p ${CR_PYPI_TEST_API_TOKEN}
+
+push_to_external_pipy_release_registry:
+  stage: deploy
+  when: manual
+  only:
+    - main
+  script:
+    - poetry build
+    - poetry publish -u __token__ -p ${CR_PYPI_RELEASE_API_TOKEN}

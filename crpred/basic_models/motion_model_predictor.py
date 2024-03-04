@@ -1,12 +1,15 @@
 import copy
 from dataclasses import dataclass
-from typing import Tuple, List
+from typing import List, Tuple
 
-from commonroad.prediction.prediction import Prediction, Occupancy
+from commonroad.prediction.prediction import Occupancy, Prediction
 from commonroad.scenario.scenario import Scenario
 from commonroad.scenario.state import CustomState, InitialState
 from commonroad.scenario.trajectory import Trajectory
-from commonroad_dc.costs.route_matcher import create_cosy_from_lanelet, get_orientation_at_position
+from commonroad_dc.costs.route_matcher import (
+    create_cosy_from_lanelet,
+    get_orientation_at_position,
+)
 from commonroad_dc.pycrccosy import CurvilinearCoordinateSystem
 
 from crpred.predictor_interface import PredictorInterface
@@ -49,9 +52,11 @@ class MotionModelPredictor(PredictorInterface):
         for idx, dyno in enumerate(sc.dynamic_obstacles):
             if dyno.prediction:
                 steps_in_scenario = len(dyno.prediction.trajectory.state_list)
-                steps_to_predict = self._config.num_steps_prediction \
-                    if self._config.num_steps_prediction <= steps_in_scenario \
+                steps_to_predict = (
+                    self._config.num_steps_prediction
+                    if self._config.num_steps_prediction <= steps_in_scenario
                     else steps_in_scenario
+                )
             else:
                 steps_to_predict = self._config.num_steps_prediction
 
@@ -66,11 +71,13 @@ class MotionModelPredictor(PredictorInterface):
 
             # Calculate the curvilinear coordinates
             merged_lanelets, merged_lanelets_id = get_merged_laneletes_from_position(
-                sc.lanelet_network, initial_state.position)
+                sc.lanelet_network, initial_state.position
+            )
             curvilinear_cosy: CurvilinearCoordinateSystem = create_cosy_from_lanelet(merged_lanelets[0])
 
             curvilinear_pos: Tuple[float, float] = curvilinear_cosy.convert_to_curvilinear_coords(
-                initial_state.position[0], initial_state.position[1])
+                initial_state.position[0], initial_state.position[1]
+            )
             pos_lon, pos_lat = curvilinear_pos
 
             # Calculate the orientation in the curvilinear coordinate system
@@ -100,16 +107,23 @@ class MotionModelPredictor(PredictorInterface):
             if not pred_sc.dynamic_obstacles[idx].prediction:
                 pred_sc.dynamic_obstacles[idx].prediction = Prediction(
                     initial_time_step=initial_time_step,
-                    occupancy_set=[Occupancy(i, dyno.obstacle_shape) for i in
-                                   range(initial_time_step, initial_time_step + steps_to_predict)]
+                    occupancy_set=[
+                        Occupancy(i, dyno.obstacle_shape)
+                        for i in range(initial_time_step, initial_time_step + steps_to_predict)
+                    ],
                 )
 
             pred_sc.dynamic_obstacles[idx].prediction.trajectory = pred_trajectory
 
         return pred_sc
 
-    def _predict_states(self, initial_values: InitialStateValues, dt: float,
-                        curvilinear_cosy: CurvilinearCoordinateSystem, prediction_range: range) -> List[CustomState]:
+    def _predict_states(
+        self,
+        initial_values: InitialStateValues,
+        dt: float,
+        curvilinear_cosy: CurvilinearCoordinateSystem,
+        prediction_range: range,
+    ) -> List[CustomState]:
         """
         Abstract method for calculating model-specific predictions for future states.
 

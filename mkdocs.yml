@@ -1,0 +1,14 @@
+site_name: CommonRoad Prediction
+theme:
+  name: material
+  logo: assets/commonroad_white150.png
+plugins:
+  - mkdocstrings
+
+nav:
+  - Introduction: index.md
+  - Example Usage: example.md
+  - API Reference:
+      - "Basic Interfaces and Modules": basic_api.md
+      - "Basic Prediction Models": basic_models_api.md
+      - "Advanced Prediction Models": advanced_models_api.md

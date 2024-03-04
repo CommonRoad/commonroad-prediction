@@ -1,6 +1,7 @@
+from commonroad.scenario.scenario import Scenario
+
 from crpred.predictor_interface import PredictorInterface
 from crpred.utility.config import PredictorParams
-from commonroad.scenario.scenario import Scenario
 
 
 class AgentPredictor(PredictorInterface):

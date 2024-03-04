@@ -5,7 +5,10 @@ from commonroad.scenario.state import CustomState
 from commonroad_dc.costs.route_matcher import get_orientation_at_position
 from commonroad_dc.pycrccosy import CurvilinearCoordinateSystem
 
-from crpred.basic_models.motion_model_predictor import MotionModelPredictor, InitialStateValues
+from crpred.basic_models.motion_model_predictor import (
+    InitialStateValues,
+    MotionModelPredictor,
+)
 from crpred.utility.config import PredictorParams
 
 
@@ -13,8 +16,13 @@ class ConstantVelocityLinearPredictor(MotionModelPredictor):
     def __init__(self, config: PredictorParams = PredictorParams()):
         super().__init__(config=config)
 
-    def _predict_states(self, initial_values: InitialStateValues, dt: float,
-                        curvilinear_cosy: CurvilinearCoordinateSystem, prediction_range: range) -> List[CustomState]:
+    def _predict_states(
+        self,
+        initial_values: InitialStateValues,
+        dt: float,
+        curvilinear_cosy: CurvilinearCoordinateSystem,
+        prediction_range: range,
+    ) -> List[CustomState]:
         pred_state_list: List[CustomState] = []
 
         delta_v_lon_0: float = initial_values.v * np.cos(initial_values.orientation_in_ccosy) * dt
@@ -46,8 +54,13 @@ class ConstantVelocityCurvilinearPredictor(MotionModelPredictor):
     def __init__(self, config: PredictorParams = PredictorParams()):
         super().__init__(config=config)
 
-    def _predict_states(self, initial_values: InitialStateValues, dt: float,
-                        curvilinear_cosy: CurvilinearCoordinateSystem, prediction_range: range) -> List[CustomState]:
+    def _predict_states(
+        self,
+        initial_values: InitialStateValues,
+        dt: float,
+        curvilinear_cosy: CurvilinearCoordinateSystem,
+        prediction_range: range,
+    ) -> List[CustomState]:
         pred_state_list: List[CustomState] = []
 
         p_lon = initial_values.p_lon

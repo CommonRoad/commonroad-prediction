@@ -1,5 +1,6 @@
 from commonroad.scenario.scenario import Scenario
 from commonroad.scenario.trajectory import Trajectory
+
 from crpred.predictor_interface import PredictorInterface
 from crpred.utility.config import PredictorParams
 
@@ -24,9 +25,11 @@ class GroundTruthPredictor(PredictorInterface):
         :return: CommonRoad scenario containing prediction.
         """
         for obstacle in sc.dynamic_obstacles:
-            state_list = [state for state in
-                          obstacle.prediction.trajectory.state_list[:self._config.num_steps_prediction]
-                          if state.time_step <= self._config.num_steps_prediction]
+            state_list = [
+                state
+                for state in obstacle.prediction.trajectory.state_list[: self._config.num_steps_prediction]
+                if state.time_step <= self._config.num_steps_prediction
+            ]
             traj = Trajectory(state_list[0].time_step, state_list)
             obstacle.prediction.trajectory = traj
 

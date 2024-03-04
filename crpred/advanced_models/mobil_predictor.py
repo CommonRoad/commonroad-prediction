@@ -1,6 +1,5 @@
 from crpred.advanced_models.agent_predictor import AgentPredictor
 from crpred.advanced_models.mobil_agent import MOBILAgent
-from crpred.utility import visualization as util_visualization
 from crpred.utility.config import PredictorParams
 
 

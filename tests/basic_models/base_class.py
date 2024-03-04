@@ -17,12 +17,14 @@ class MotionModelPredictorTest:
         scenario = create_default_scenario()
         pred_scenario = self.predictor.predict(scenario)
         assert pred_scenario.dt == scenario.dt
-        assert len(pred_scenario.dynamic_obstacles[
-                       0].prediction.trajectory.state_list) == self.test_config.num_steps_prediction
+        assert (
+            len(pred_scenario.dynamic_obstacles[0].prediction.trajectory.state_list)
+            == self.test_config.num_steps_prediction
+        )
 
     def test_system(self):
-        test_scenarios_dir = Path('system_test_scenarios')
-        scenario_paths = test_scenarios_dir.glob('*.xml')
+        test_scenarios_dir = Path("system_test_scenarios")
+        scenario_paths = test_scenarios_dir.glob("*.xml")
 
         for path in scenario_paths:
             scenario, _ = CommonRoadFileReader(path).open(lanelet_assignment=True)

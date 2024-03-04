@@ -1,6 +1,6 @@
 import numpy as np
-from commonroad.scenario.scenario import Scenario
 from commonroad.scenario.lanelet import Lanelet, LaneletNetwork
+from commonroad.scenario.scenario import Scenario
 
 
 def clear_obstacle_trajectory(sc: Scenario, initial_time_step: int = 0):
