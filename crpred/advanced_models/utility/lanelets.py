@@ -1,10 +1,11 @@
-from typing import Tuple, List
+from typing import List, Tuple
+
 from commonroad.scenario.lanelet import Lanelet, LaneletNetwork
 
 
-def all_lanelets_by_merging_predecessors_from_lanelet(lanelet: 'Lanelet',
-                                                      network: 'LaneletNetwork', max_length: float = 150.0) \
-        -> Tuple[List['Lanelet'], List[List[int]]]:
+def all_lanelets_by_merging_predecessors_from_lanelet(
+    lanelet: "Lanelet", network: "LaneletNetwork", max_length: float = 150.0
+) -> Tuple[List["Lanelet"], List[List[int]]]:
     """
     Computes all predecessor lanelets starting from a provided lanelet
     and merges them to a single lanelet for each route.
@@ -14,9 +15,8 @@ def all_lanelets_by_merging_predecessors_from_lanelet(lanelet: 'Lanelet',
     :param max_length: maximal length of merged lanelets can be provided
     :return: List of merged lanelets, Lists of lanelet ids of which each merged lanelet consists
     """
-    assert isinstance(lanelet, Lanelet), '<Lanelet>: provided lanelet is not a valid Lanelet!'
-    assert isinstance(network, LaneletNetwork), '<Lanelet>: provided lanelet network is not a ' \
-                                                'valid lanelet network!'
+    assert isinstance(lanelet, Lanelet), "<Lanelet>: provided lanelet is not a valid Lanelet!"
+    assert isinstance(network, LaneletNetwork), "<Lanelet>: provided lanelet network is not a " "valid lanelet network!"
 
     if lanelet.predecessor is None or len(lanelet.predecessor) == 0:
         return [lanelet], [[lanelet.lanelet_id]]
@@ -40,8 +40,9 @@ def all_lanelets_by_merging_predecessors_from_lanelet(lanelet: 'Lanelet',
     return merged_lanelets, merge_jobs_final
 
 
-def find_lanelet_predecessors_in_range(lanelet: "Lanelet", lanelet_network: "LaneletNetwork",
-                                       max_length=50.0) -> List[List[int]]:
+def find_lanelet_predecessors_in_range(
+    lanelet: "Lanelet", lanelet_network: "LaneletNetwork", max_length=50.0
+) -> List[List[int]]:
     """
     Finds all possible predecessor paths (id sequences) within max_length.
 

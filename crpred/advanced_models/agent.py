@@ -1,18 +1,24 @@
 import abc
 import copy
-from typing import List, Set, Dict
-import numpy as np
+from typing import Dict, List, Set
 
-from commonroad.scenario.scenario import Scenario
+import numpy as np
+from commonroad.prediction.prediction import Trajectory, TrajectoryPrediction
 from commonroad.scenario.lanelet import Lanelet
 from commonroad.scenario.obstacle import DynamicObstacle
+from commonroad.scenario.scenario import Scenario
 from commonroad.scenario.state import TraceState
-from commonroad.prediction.prediction import TrajectoryPrediction, Trajectory
+from commonroad_dc.geometry.util import (
+    chaikins_corner_cutting,
+    compute_orientation_from_polyline,
+    compute_pathlength_from_polyline,
+    resample_polyline,
+)
 from commonroad_dc.pycrccosy import CurvilinearCoordinateSystem
-from commonroad_dc.geometry.util import compute_orientation_from_polyline, compute_pathlength_from_polyline,\
-    chaikins_corner_cutting, resample_polyline
 
-from crpred.advanced_models.utility.lanelets import all_lanelets_by_merging_predecessors_from_lanelet
+from crpred.advanced_models.utility.lanelets import (
+    all_lanelets_by_merging_predecessors_from_lanelet,
+)
 
 
 class Agent:
@@ -26,8 +32,9 @@ class Agent:
         self._occ_current = obstacle.occupancy_at_time(self._state_current.time_step)
         self._traj_state_list = []
         self._pred_occ = []
-        self._set_ids_lanelets_current = \
-            self._current_scenario.lanelet_network.find_lanelet_by_shape(self._occ_current.shape)
+        self._set_ids_lanelets_current = self._current_scenario.lanelet_network.find_lanelet_by_shape(
+            self._occ_current.shape
+        )
 
     @property
     def agent_id(self):
@@ -50,8 +57,9 @@ class Agent:
 
         :return: CommonRoad trajectory prediction.
         """
-        return TrajectoryPrediction(Trajectory(self._traj_state_list[0].time_step, self._traj_state_list),
-                                    self._obstacle.obstacle_shape)
+        return TrajectoryPrediction(
+            Trajectory(self._traj_state_list[0].time_step, self._traj_state_list), self._obstacle.obstacle_shape
+        )
 
     def _merge_lanelet_and_create_clcs(self, lanelet: Lanelet, merge_predecessors: bool = True):
         # get merged lanelets
@@ -71,20 +79,17 @@ class Agent:
         return list_lanelets_merged, dict_clcs, dict_merge_ids
 
     def _retrieve_merged_lanelets(self, lanelet: Lanelet, merge_predecessors: bool = True):
-        list_lanelets_merged_suc, list_suc_merge_ids = \
-            Lanelet.all_lanelets_by_merging_successors_from_lanelet(
-                lanelet=lanelet,
-                network=self._current_scenario.lanelet_network,
-                max_length=300.0)
+        list_lanelets_merged_suc, list_suc_merge_ids = Lanelet.all_lanelets_by_merging_successors_from_lanelet(
+            lanelet=lanelet, network=self._current_scenario.lanelet_network, max_length=300.0
+        )
 
         list_lanelets_merged = []
         dict_merge_ids = {}
         if merge_predecessors:
             for lnlt, suc_merge_ids in zip(list_lanelets_merged_suc, list_suc_merge_ids):
-                list_lanelets_merged_pred, list_pred_merge_ids = \
-                    all_lanelets_by_merging_predecessors_from_lanelet(lnlt,
-                                                                      self._current_scenario.lanelet_network,
-                                                                      300.0)
+                list_lanelets_merged_pred, list_pred_merge_ids = all_lanelets_by_merging_predecessors_from_lanelet(
+                    lnlt, self._current_scenario.lanelet_network, 300.0
+                )
 
                 for lanelet_merged, pred_merge_ids in zip(list_lanelets_merged_pred, list_pred_merge_ids):
                     set_merge_ids = set(pred_merge_ids + suc_merge_ids)
@@ -100,10 +105,15 @@ class Agent:
 
         return list_lanelets_merged, dict_merge_ids
 
-    def _find_followers_and_leaders_at_time_step(self, time_step: int, list_lanelets: List[Lanelet],
-                                                 sc: Scenario,
-                                                 dict_clcs: Dict[int, CurvilinearCoordinateSystem],
-                                                 dict_merge_ids: Dict[int, Set[int]], state_ego: TraceState):
+    def _find_followers_and_leaders_at_time_step(
+        self,
+        time_step: int,
+        list_lanelets: List[Lanelet],
+        sc: Scenario,
+        dict_clcs: Dict[int, CurvilinearCoordinateSystem],
+        dict_merge_ids: Dict[int, Set[int]],
+        state_ego: TraceState,
+    ):
         obs_ego = self._obstacle
         dist_to_leader_min = dist_to_follower_min = np.infty
         leader_clcs = None
@@ -114,8 +124,9 @@ class Agent:
             clcs = dict_clcs[lanelet.lanelet_id]
             p_lon_ego, _ = clcs.convert_to_curvilinear_coords(state_ego.position[0], state_ego.position[1])
 
-            set_ids_obstacles_in_lanelet = \
-                self._dynamic_obstacles_in_lanelet_set(dict_merge_ids[lanelet.lanelet_id], time_step)
+            set_ids_obstacles_in_lanelet = self._dynamic_obstacles_in_lanelet_set(
+                dict_merge_ids[lanelet.lanelet_id], time_step
+            )
             set_ids_obstacles_in_lanelet.difference_update({self._obstacle.obstacle_id})
             list_ids_obstacles_in_lanelet = list(set_ids_obstacles_in_lanelet)
 
@@ -176,8 +187,15 @@ class Agent:
             obs_lead = obs_ego
             rate_approaching_follower = self.calculate_approaching_rate(obs_follow, obs_lead, time_step)
 
-        return leader_clcs, id_leader, dist_to_leader_min, rate_approaching_leader, \
-            id_follower, dist_to_follower_min, rate_approaching_follower
+        return (
+            leader_clcs,
+            id_leader,
+            dist_to_leader_min,
+            rate_approaching_leader,
+            id_follower,
+            dist_to_follower_min,
+            rate_approaching_follower,
+        )
 
     def _dynamic_obstacles_in_lanelet_set(self, set_lanelet_ids: Set[int], time_step: int):
         """
@@ -222,19 +240,22 @@ class Agent:
 
     @staticmethod
     def calculate_approaching_rate(obs_follower: DynamicObstacle, obs_leader: DynamicObstacle, time_step: int):
-        assert time_step >= obs_follower.initial_state.time_step and time_step >= obs_leader.initial_state.time_step, \
-            "<Prediction Agent>: time_step out of range"
+        assert (
+            time_step >= obs_follower.initial_state.time_step and time_step >= obs_leader.initial_state.time_step
+        ), "<Prediction Agent>: time_step out of range"
 
         follower_initial_time_step = obs_follower.initial_state.time_step
         leader_initial_time_step = obs_leader.initial_state.time_step
         if time_step > follower_initial_time_step and time_step > leader_initial_time_step:
-            v_follower = \
-                obs_follower.prediction.trajectory.state_list[time_step - follower_initial_time_step - 1].velocity
+            v_follower = obs_follower.prediction.trajectory.state_list[
+                time_step - follower_initial_time_step - 1
+            ].velocity
             v_leader = obs_leader.prediction.trajectory.state_list[time_step - leader_initial_time_step - 1].velocity
 
         elif time_step > follower_initial_time_step:
-            v_follower = \
-                obs_follower.prediction.trajectory.state_list[time_step - follower_initial_time_step - 1].velocity
+            v_follower = obs_follower.prediction.trajectory.state_list[
+                time_step - follower_initial_time_step - 1
+            ].velocity
             v_leader = obs_leader.initial_state.velocity
 
         elif time_step > leader_initial_time_step:

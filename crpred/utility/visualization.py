@@ -1,16 +1,16 @@
 import logging
 import time
 from pathlib import Path
-from typing import Tuple, List, Union
+from typing import List, Tuple, Union
 
-import matplotlib.pyplot as plt
-import matplotlib
 import imageio
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
 from commonroad.scenario.lanelet import LaneletNetwork
 from commonroad.scenario.scenario import Scenario
-from commonroad.visualization.mp_renderer import MPRenderer
 from commonroad.visualization.draw_params import MPDrawParams
-import numpy as np
+from commonroad.visualization.mp_renderer import MPRenderer
 
 logger = logging.getLogger(__name__)
 logging.getLogger("PIL").setLevel(logging.WARNING)
@@ -18,19 +18,19 @@ logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 
 
 def plot_scenario(
-        scenario: Scenario,
-        figsize: Tuple = (25, 15),
-        step_start: int = 0,
-        step_end: int = 10,
-        steps: List[int] = None,
-        plot_limits: List = None,
-        path_output: Path = None,
-        save_gif: bool = True,
-        duration: float = None,
-        save_plots: bool = True,
-        # show_lanelet_label: bool = False,
-        # predictor_type: str = None,
-        plot_occupancies: bool = False,
+    scenario: Scenario,
+    figsize: Tuple = (25, 15),
+    step_start: int = 0,
+    step_end: int = 10,
+    steps: List[int] = None,
+    plot_limits: List = None,
+    path_output: Path = None,
+    save_gif: bool = True,
+    duration: float = None,
+    save_plots: bool = True,
+    # show_lanelet_label: bool = False,
+    # predictor_type: str = None,
+    plot_occupancies: bool = False,
 ):
     """
     Plots scenarios with predicted motions.
@@ -70,7 +70,7 @@ def plot_scenario(
         ax = plt.gca()
         ax.set_aspect("equal")
         ax.set_title(f"$t = {time_step / 10.0:.1f}$ [s]", fontsize=28)
-        ax.set_xlabel(f"$s$ [m]", fontsize=28)
+        ax.set_xlabel("$s$ [m]", fontsize=28)
         ax.set_ylabel("$d$ [m]", fontsize=28)
         plt.margins(0, 0)
         renderer.render()
@@ -85,8 +85,9 @@ def plot_scenario(
             plt.show()
 
     if save_gif and save_plots:
-        make_gif(path_output, "png_prediction_", steps,
-                 "0_gif_" + str(scenario.scenario_id), duration, delete_imgs=True)
+        make_gif(
+            path_output, "png_prediction_", steps, "0_gif_" + str(scenario.scenario_id), duration, delete_imgs=True
+        )
 
     if plot_occupancies:
         time_begin = steps[0]
@@ -109,7 +110,7 @@ def plot_scenario(
         ax = plt.gca()
         ax.set_aspect("equal")
         ax.set_title(f"$t = {time_begin}$ [s]", fontsize=28)
-        ax.set_xlabel(f"$s$ [m]", fontsize=28)
+        ax.set_xlabel("$s$ [m]", fontsize=28)
         ax.set_ylabel("$d$ [m]", fontsize=28)
         plt.margins(0, 0)
         renderer.render()
@@ -148,12 +149,12 @@ def save_fig(save_gif: bool, path_output: Path, time_step: int, identifier: str 
 
 
 def make_gif(
-        path: Path,
-        prefix: str,
-        steps: Union[range, List[int]],
-        file_save_name="animation",
-        duration: float = 0.1,
-        delete_imgs: bool = False,
+    path: Path,
+    prefix: str,
+    steps: Union[range, List[int]],
+    file_save_name="animation",
+    duration: float = 0.1,
+    delete_imgs: bool = False,
 ):
     images = []
     filenames = []
@@ -170,8 +171,9 @@ def make_gif(
     imageio.mimsave(path.joinpath(file_save_name + ".gif"), images, duration=duration)
 
 
-def visualize_prediction(predicted_scenario: Scenario, start_step: int = 0, end_step: int = 20,
-                         obstacle_idx: int = 0) -> matplotlib.figure.Figure:
+def visualize_prediction(
+    predicted_scenario: Scenario, start_step: int = 0, end_step: int = 20, obstacle_idx: int = 0
+) -> matplotlib.figure.Figure:
     obstacle = predicted_scenario.dynamic_obstacles[obstacle_idx]
     state_list = obstacle.prediction.trajectory.state_list
 

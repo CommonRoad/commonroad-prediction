@@ -11,6 +11,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: BSD License",
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
@@ -19,19 +20,57 @@ classifiers = [
 readme = "README.md"
 packages = [{include = "crpred"}]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-commonroad-io = ">=2023.2"
-imageio = "^2.31.1"
+#[tool.poetry.urls]
+#Documentation = "https://commonroad.in.tum.de/static/docs/commonroad-io/index.html"
+#Forum = "https://commonroad.in.tum.de/forum/c/commonroad-io"
+#Source = "https://gitlab.lrz.de/tum-cps/commonroad_io"
 
+[tool.poetry.dependencies]
+python = "^3.9"
+commonroad-io = ">=2023.4"
+imageio = "^2.31.1"
+commonroad-drivability-checker = [
+    {version = "2023.1", python = "<3.11"},
+    {git = "https://github.com/CommonRoad/commonroad-drivability-checker.git", branch = "development", python = ">=3.11"}
+    ]
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+black = "24.1.1"
+isort = "5.13.1"
+flake8 = "6.1.0"
+pre-commit = "3.6.2"
+
+[tool.poetry.group.tests]
+optional = true
+
+[tool.poetry.group.tests.dependencies]
+pytest = "^7.2.2"
+coverage = "^7.2.2"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+mkdocstrings-python = "^1.8.0"
+mkdocs-material = "^9.5.10"
+
+[tool.poetry.group.tutorials]
+optional = true
+
+[tool.poetry.group.tutorials.dependencies]
+jupyter = ">=1.0.0"
+jupyterlab = ">=4.0.11"  # https://github.com/CommonRoad/commonroad-io/security/dependabot/22
+jupyter-lsp = ">=2.2.2" # https://github.com/CommonRoad/commonroad-io/security/dependabot/18
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.black]
-line-length = 120
-experimental-string-processing = true
-
-[tool.autoflake]
-max-line-length = 120
