@@ -10,7 +10,7 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
-#    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.11",
 #    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: BSD License",
     "Operating System :: POSIX :: Linux",
@@ -27,12 +27,9 @@ packages = [{include = "crpred"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-commonroad-io = ">=2023.4"
+commonroad-io = ">=2024.1"
 imageio = "^2.31.1"
-commonroad-drivability-checker = "2023.1" #[
-  #  {version = "2023.1", python = "<3.11"},
-#    {git = "https://github.com/CommonRoad/commonroad-drivability-checker.git", branch = "development", python = ">=3.11"}
-#    ]
+commonroad-drivability-checker = ">=2024.1"
 
 [tool.poetry.group.dev]
 optional = true
