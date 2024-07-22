@@ -5,7 +5,7 @@ stages:
   - deploy
 
 default:
-  image: python:3.10
+  image: python:3.11
   before_script:
     - apt-get update && apt-get install -y cmake build-essential git pkg-config ca-certificates wget libomp-dev libeigen3-dev libboost-all-dev uuid-dev libcgal-dev
     - pip install poetry
@@ -35,13 +35,13 @@ test_python_versions:
   stage: test
   parallel :
     matrix :
-      - PYTHON_VERSIONS : [ "3.9"]#, "3.10", "3.11" ]
+      - PYTHON_VERSIONS : [ "3.9", "3.10"] #, "3.11" ]
   script:
     - *run-test-with-coverage
   needs: []
 
 test_latest_python_version_and_coverage:
-  image: python:3.10
+  image: python:3.11
   stage: test
   script:
     - *run-test-with-coverage
@@ -52,6 +52,17 @@ test_latest_python_version_and_coverage:
       coverage_report:
         coverage_format: cobertura
         path: coverage.xml
+
+build_and_update_packages_debian:
+  image : python:$PYTHON_VERSIONS
+  stage: test
+  parallel :
+    matrix :
+      - PYTHON_VERSIONS : [ "3.9", "3.10", "3.11" ]
+  script:
+    - poetry update
+    - poetry install
+  needs: []
 
 pages:
   stage: deploy
