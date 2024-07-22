@@ -2,7 +2,7 @@ import copy
 from dataclasses import dataclass
 from typing import List, Tuple
 
-from commonroad.prediction.prediction import Occupancy, Prediction
+from commonroad.prediction.prediction import TrajectoryPrediction
 from commonroad.scenario.scenario import Scenario
 from commonroad.scenario.state import CustomState, InitialState
 from commonroad.scenario.trajectory import Trajectory
@@ -105,12 +105,8 @@ class MotionModelPredictor(PredictorInterface):
 
             # Check if a prediction object exists in the dynamic obstacle
             if not pred_sc.dynamic_obstacles[idx].prediction:
-                pred_sc.dynamic_obstacles[idx].prediction = Prediction(
-                    initial_time_step=initial_time_step,
-                    occupancy_set=[
-                        Occupancy(i, dyno.obstacle_shape)
-                        for i in range(initial_time_step, initial_time_step + steps_to_predict)
-                    ],
+                pred_sc.dynamic_obstacles[idx].prediction = TrajectoryPrediction(
+                    trajectory=pred_trajectory, shape=dyno.obstacle_shape
                 )
 
             pred_sc.dynamic_obstacles[idx].prediction.trajectory = pred_trajectory

@@ -4,6 +4,7 @@ theme:
   logo: assets/commonroad_white150.png
 plugins:
   - mkdocstrings
+  - search
 
 nav:
   - Introduction: index.md
