@@ -29,6 +29,7 @@ python = "^3.9,<3.12"
 commonroad-io = ">=2024.1"
 imageio = "^2.31.1"
 commonroad-drivability-checker = ">=2024.1"
+numpy = "<2.0"
 
 [tool.poetry.group.dev]
 optional = true
