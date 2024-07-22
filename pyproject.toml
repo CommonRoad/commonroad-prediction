@@ -1,13 +1,12 @@
 [tool.poetry]
 name = "commonroad-prediction"
-version = "0.1.0"
+version = "0.1.1"
 description = "A collection and interface for CommonRoad prediction algorithms."
 authors = ["Cyber-Physical Systems Group, Technical University of Munich <commonroad@lists.lrz.de>"]
 license = "BSD-3-Clause"
 homepage = "https://commonroad.in.tum.de"
 keywords= ["autonomous", "automated", "vehicles", "driving", "motion", "planning", "prediction"]
 classifiers = [
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -26,10 +25,11 @@ packages = [{include = "crpred"}]
 #Source = "https://gitlab.lrz.de/tum-cps/commonroad_io"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.9,<3.12"
 commonroad-io = ">=2024.1"
 imageio = "^2.31.1"
 commonroad-drivability-checker = ">=2024.1"
+numpy = "<2.0"
 
 [tool.poetry.group.dev]
 optional = true
