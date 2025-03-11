@@ -2,9 +2,7 @@ import numpy as np
 import pytest
 
 import tests.utilities as test_utils
-from crpred.basic_models.constant_acceleration_predictor import (
-    ConstantAccelerationCurvilinearPredictor,
-)
+from crpred.basic_models.constant_acceleration_predictor import ConstantAccelerationCurvilinearPredictor
 from crpred.utility.config import PredictorParams
 from tests.basic_models.base_class import MotionModelPredictorTest
 

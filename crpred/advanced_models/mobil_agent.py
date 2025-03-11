@@ -96,9 +96,13 @@ class MOBILAgent(Agent):
 
             # convert state to curvilinear coordinate system
             ego_state_current = self.state_current
-            p_lon_current, p_lat_current, v_lon_current, v_lat_current, o_ref_current = (
-                self._convert_to_curvilinear_state(ego_state_current, self.ego_clcs)
-            )
+            (
+                p_lon_current,
+                p_lat_current,
+                v_lon_current,
+                v_lat_current,
+                o_ref_current,
+            ) = self._convert_to_curvilinear_state(ego_state_current, self.ego_clcs)
 
             a_ego_current = self.a_ego_current
 
@@ -154,9 +158,13 @@ class MOBILAgent(Agent):
                 )
 
                 # project ego to left clcs
-                p_lon_change_left, p_lat_change_left, v_lon_change_left, v_lat_change_left, o_ref_change_left = (
-                    self._convert_to_curvilinear_state(ego_state_current, self.left_clcs)
-                )
+                (
+                    p_lon_change_left,
+                    p_lat_change_left,
+                    v_lon_change_left,
+                    v_lat_change_left,
+                    o_ref_change_left,
+                ) = self._convert_to_curvilinear_state(ego_state_current, self.left_clcs)
 
                 a_ego_change_left = self._calculate_acceleration(
                     self.id_agent,
@@ -212,9 +220,13 @@ class MOBILAgent(Agent):
                 )
 
                 # project ego to right clcs
-                p_lon_change_right, p_lat_change_right, v_lon_change_right, v_lat_change_right, o_ref_change_right = (
-                    self._convert_to_curvilinear_state(ego_state_current, self.right_clcs)
-                )
+                (
+                    p_lon_change_right,
+                    p_lat_change_right,
+                    v_lon_change_right,
+                    v_lat_change_right,
+                    o_ref_change_right,
+                ) = self._convert_to_curvilinear_state(ego_state_current, self.right_clcs)
 
                 a_ego_change_right = self._calculate_acceleration(
                     self.id_agent,
@@ -330,17 +342,23 @@ class MOBILAgent(Agent):
         # iterate through lanelet and its obstacles, find the one with the minimum distance to ego
         self.left_clcs = self.right_clcs = self.ego_clcs = None
 
-        self.rate_approaching_leader = self.rate_approaching_follower = self.rate_approaching_left_leader = (
+        self.rate_approaching_leader = (
+            self.rate_approaching_follower
+        ) = (
+            self.rate_approaching_left_leader
+        ) = (
             self.rate_approaching_left_follower
         ) = self.rate_approaching_right_leader = self.rate_approaching_right_follower = np.infty
 
-        self.dist_to_leader_min = self.dist_to_follower_min = self.dist_to_left_leader_min = (
-            self.dist_to_left_follower_min
-        ) = self.dist_to_right_leader_min = self.dist_to_right_follower_min = np.infty
+        self.dist_to_leader_min = (
+            self.dist_to_follower_min
+        ) = (
+            self.dist_to_left_leader_min
+        ) = self.dist_to_left_follower_min = self.dist_to_right_leader_min = self.dist_to_right_follower_min = np.infty
 
-        self.id_leader = self.id_follower = self.id_left_leader = self.id_left_follower = self.id_right_leader = (
-            self.id_right_follower
-        ) = None
+        self.id_leader = (
+            self.id_follower
+        ) = self.id_left_leader = self.id_left_follower = self.id_right_leader = self.id_right_follower = None
 
         # find the best current lanelet based on ego acceleration
         a_ego_best = -np.infty
@@ -365,9 +383,13 @@ class MOBILAgent(Agent):
                 ego_clcs = self.dict_clcs_ego[lanelet_id][self.dict_list_lanelets_merged_ego[lanelet_id][0].lanelet_id]
 
             # convert state to curvilinear coordinate system
-            p_lon_current, p_lat_current, v_lon_current, v_lat_current, o_ref_current = (
-                self._convert_to_curvilinear_state(state_ego, ego_clcs)
-            )
+            (
+                p_lon_current,
+                p_lat_current,
+                v_lon_current,
+                v_lat_current,
+                o_ref_current,
+            ) = self._convert_to_curvilinear_state(state_ego, ego_clcs)
 
             a_ego_temp = self._calculate_acceleration(
                 self.id_agent, v_lon_current, id_leader, dist_to_leader_min, rate_approaching_leader
@@ -497,9 +519,11 @@ class MOBILAgent(Agent):
                     lanelet_current.adj_right_same_direction
                     and lanelet_current.adj_right not in self.set_ids_lanelets_current
                 ):
-                    list_lanelets_merged_right, dict_clcs_right, dict_merge_ids_right = (
-                        self._get_merged_lanelet_and_clcs(lanelet_current.adj_right)
-                    )
+                    (
+                        list_lanelets_merged_right,
+                        dict_clcs_right,
+                        dict_merge_ids_right,
+                    ) = self._get_merged_lanelet_and_clcs(lanelet_current.adj_right)
 
                     self.dict_clcs_right = {**self.dict_clcs_right, **dict_clcs_right}
                     self.dict_lanelet_merge_ids_right = {**self.dict_lanelet_merge_ids_right, **dict_merge_ids_right}

@@ -6,11 +6,8 @@ from commonroad.prediction.prediction import TrajectoryPrediction
 from commonroad.scenario.scenario import Scenario
 from commonroad.scenario.state import CustomState, InitialState
 from commonroad.scenario.trajectory import Trajectory
-from commonroad_dc.costs.route_matcher import (
-    create_cosy_from_lanelet,
-    get_orientation_at_position,
-)
 from commonroad_clcs.clcs import CurvilinearCoordinateSystem
+from commonroad_dc.costs.route_matcher import create_cosy_from_lanelet, get_orientation_at_position
 
 from crpred.predictor_interface import PredictorInterface
 from crpred.utility.common import get_merged_laneletes_from_position
