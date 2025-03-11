@@ -38,7 +38,11 @@ def plot_scenario(
     path_output = path_output or Path("./plots/" + str(scenario.scenario_id))
     path_output.mkdir(parents=True, exist_ok=True)
 
-    plot_limits = plot_limits if plot_limits else compute_plot_limits_from_lanelet_network(scenario.lanelet_network)
+    plot_limits = (
+        plot_limits
+        if plot_limits
+        else compute_plot_limits_from_lanelet_network(scenario.lanelet_network)
+    )
     if steps:
         steps = [step for step in steps if step <= step_end + 1]
     else:
@@ -86,7 +90,12 @@ def plot_scenario(
 
     if save_gif and save_plots:
         make_gif(
-            path_output, "png_prediction_", steps, "0_gif_" + str(scenario.scenario_id), duration, delete_imgs=True
+            path_output,
+            "png_prediction_",
+            steps,
+            "0_gif_" + str(scenario.scenario_id),
+            duration,
+            delete_imgs=True,
         )
 
     if plot_occupancies:
@@ -103,7 +112,11 @@ def plot_scenario(
         scenario.draw(renderer, draw_params=draw_params)
 
         for obs in scenario.dynamic_obstacles:
-            [occ.draw(renderer) for occ in obs.prediction.occupancy_set if occ.time_step in steps]
+            [
+                occ.draw(renderer)
+                for occ in obs.prediction.occupancy_set
+                if occ.time_step in steps
+            ]
 
         # settings and adjustments
         plt.rc("axes", axisbelow=True)
@@ -116,7 +129,9 @@ def plot_scenario(
         renderer.render()
 
 
-def compute_plot_limits_from_lanelet_network(lanelet_network: LaneletNetwork, margin: int = 10):
+def compute_plot_limits_from_lanelet_network(
+    lanelet_network: LaneletNetwork, margin: int = 10
+):
     list_vertices_x = []
     list_vertices_y = []
     for lanelet in lanelet_network.lanelets:
@@ -131,7 +146,13 @@ def compute_plot_limits_from_lanelet_network(lanelet_network: LaneletNetwork, ma
     return plot_limits
 
 
-def save_fig(save_gif: bool, path_output: Path, time_step: int, identifier: str = "prediction", verbose: bool = True):
+def save_fig(
+    save_gif: bool,
+    path_output: Path,
+    time_step: int,
+    identifier: str = "prediction",
+    verbose: bool = True,
+):
     if save_gif:
         # save as png
         name_figure = "png_" + identifier
@@ -172,7 +193,10 @@ def make_gif(
 
 
 def visualize_prediction(
-    predicted_scenario: Scenario, start_step: int = 0, end_step: int = 20, obstacle_idx: int = 0
+    predicted_scenario: Scenario,
+    start_step: int = 0,
+    end_step: int = 20,
+    obstacle_idx: int = 0,
 ) -> matplotlib.figure.Figure:
     obstacle = predicted_scenario.dynamic_obstacles[obstacle_idx]
     state_list = obstacle.prediction.trajectory.state_list

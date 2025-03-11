@@ -63,7 +63,12 @@ def create_const_yaw_rate_straight_scenario(yaw_rate: float) -> Scenario:
 def create_default_scenario() -> Scenario:
     return create_straight_scenario(
         InitialState(
-            position=np.array([0.0, 0.0]), orientation=0.0, velocity=0.0, acceleration=0.0, yaw_rate=0.0, time_step=0
+            position=np.array([0.0, 0.0]),
+            orientation=0.0,
+            velocity=0.0,
+            acceleration=0.0,
+            yaw_rate=0.0,
+            time_step=0,
         )
     )
 
