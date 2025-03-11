@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.1] - 2025-XX-XX
+### Changed
+- Use new CLCS version
+
 ## [0.1.0] - 2024-07-22
 ### Changed
 - Update dependencies

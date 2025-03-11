@@ -27,7 +27,9 @@ class GroundTruthPredictor(PredictorInterface):
         for obstacle in sc.dynamic_obstacles:
             state_list = [
                 state
-                for state in obstacle.prediction.trajectory.state_list[: self._config.num_steps_prediction]
+                for state in obstacle.prediction.trajectory.state_list[
+                    : self._config.num_steps_prediction
+                ]
                 if state.time_step <= self._config.num_steps_prediction
             ]
             traj = Trajectory(state_list[0].time_step, state_list)

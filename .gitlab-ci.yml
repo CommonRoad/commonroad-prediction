@@ -18,17 +18,13 @@ default:
   - coverage report -m || true
 
 # static_check
-formatting_check:
+static_check:
   stage: style_check
+  before_script:
+    - pip install pre-commit
   script:
-    - black --check .
-    - isort --check-only .
+    - pre-commit run --all-files --show-diff-on-failure
 
-lint_flake8:
-  stage: style_check
-  script:
-    - pip install "flake8~=6.1.0"
-    - flake8 ./tests ./crpred ./docs ./tutorials
 
 test_python_versions:
   image : python:$PYTHON_VERSIONS

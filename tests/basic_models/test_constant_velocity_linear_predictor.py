@@ -26,8 +26,12 @@ class TestConstantVelocityLinearPredictor(MotionModelPredictorTest):
 
         final_state = dyno.initial_state.__getattribute__(
             "position"
-        ) + self.test_config.num_steps_prediction * scenario.dt * np.array([velocity, 0])
-        np.testing.assert_array_equal(dyno.prediction.trajectory.state_list[-1].position, final_state)
+        ) + self.test_config.num_steps_prediction * scenario.dt * np.array(
+            [velocity, 0]
+        )
+        np.testing.assert_array_equal(
+            dyno.prediction.trajectory.state_list[-1].position, final_state
+        )
 
     def test_prediction_const_acceleration(self):
         acceleration = 1.0
@@ -40,7 +44,9 @@ class TestConstantVelocityLinearPredictor(MotionModelPredictorTest):
             assert state.orientation == 0.0
 
         final_state = dyno.initial_state.__getattribute__("position")
-        np.testing.assert_array_equal(dyno.prediction.trajectory.state_list[-1].position, final_state)
+        np.testing.assert_array_equal(
+            dyno.prediction.trajectory.state_list[-1].position, final_state
+        )
 
     def test_prediction_const_yaw_rate(self):
         yaw_rate = 0.1
@@ -53,7 +59,9 @@ class TestConstantVelocityLinearPredictor(MotionModelPredictorTest):
             assert state.orientation == 0.0
 
         final_state = dyno.initial_state.__getattribute__("position")
-        np.testing.assert_array_equal(dyno.prediction.trajectory.state_list[-1].position, final_state)
+        np.testing.assert_array_equal(
+            dyno.prediction.trajectory.state_list[-1].position, final_state
+        )
 
 
 # Run the tests

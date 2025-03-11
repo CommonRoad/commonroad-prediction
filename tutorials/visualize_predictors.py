@@ -50,14 +50,18 @@ def main():
             all_config_distances = []
 
             for config in configs:
-                print(f"### Predicting {predictor_cls.__name__} with {num_steps_prediction} future states.")
+                print(
+                    f"### Predicting {predictor_cls.__name__} with {num_steps_prediction} future states."
+                )
                 ground_truth_predictor = GroundTruthPredictor(config)
                 ground_truth = ground_truth_predictor.predict(sc)
 
                 predictor: PredictorInterface = predictor_cls(config)
                 prediction: Scenario = predictor.predict(new_sc)
 
-                obstacle_distances: Dict[int, Dict[int, float]] = calc_scenario_difference(ground_truth, prediction)
+                obstacle_distances: Dict[int, Dict[int, float]] = (
+                    calc_scenario_difference(ground_truth, prediction)
+                )
 
                 cost = cost_function(obstacle_distances)
                 all_config_distances.append(cost)
@@ -88,7 +92,9 @@ def main():
                     print(f"{new_sc.scenario_id} Costs: {cost}")
 
             if len(all_config_distances) > 1:
-                print(f"Overall mean distance for {predictor_cls.__name__}: {mean(all_config_distances)}")
+                print(
+                    f"Overall mean distance for {predictor_cls.__name__}: {mean(all_config_distances)}"
+                )
 
 
 if __name__ == "__main__":
