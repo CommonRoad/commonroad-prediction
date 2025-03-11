@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 from commonroad.scenario.state import CustomState
 from commonroad_dc.costs.route_matcher import get_orientation_at_position
-from commonroad_dc.pycrccosy import CurvilinearCoordinateSystem
+from commonroad_clcs.clcs import CurvilinearCoordinateSystem
 
 from crpred.basic_models.motion_model_predictor import (
     InitialStateValues,

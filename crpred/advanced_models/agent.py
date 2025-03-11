@@ -14,7 +14,7 @@ from commonroad_dc.geometry.util import (
     compute_pathlength_from_polyline,
     resample_polyline,
 )
-from commonroad_dc.pycrccosy import CurvilinearCoordinateSystem
+from commonroad_clcs.clcs import CurvilinearCoordinateSystem
 
 from crpred.advanced_models.utility.lanelets import (
     all_lanelets_by_merging_predecessors_from_lanelet,

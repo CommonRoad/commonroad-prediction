@@ -10,7 +10,7 @@ from commonroad_dc.costs.route_matcher import (
     create_cosy_from_lanelet,
     get_orientation_at_position,
 )
-from commonroad_dc.pycrccosy import CurvilinearCoordinateSystem
+from commonroad_clcs.clcs import CurvilinearCoordinateSystem
 
 from crpred.predictor_interface import PredictorInterface
 from crpred.utility.common import get_merged_laneletes_from_position
