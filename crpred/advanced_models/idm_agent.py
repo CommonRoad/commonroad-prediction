@@ -11,7 +11,9 @@ from crpred.utility.config import IDMParams
 class IDMAgent(Agent):
     """Intelligent Driver Model Predictor."""
 
-    def __init__(self, obstacle: DynamicObstacle, sc: Scenario, config: IDMParams = IDMParams()):
+    def __init__(
+        self, obstacle: DynamicObstacle, sc: Scenario, config: IDMParams = IDMParams()
+    ):
         super().__init__(obstacle, sc)
 
         self._list_lanelets_merged = []
@@ -39,14 +41,18 @@ class IDMAgent(Agent):
 
         else:
             # add new state and related attributes
-            shape_new = self._obstacle.obstacle_shape.rotate_translate_local(state_new.position, state_new.orientation)
+            shape_new = self._obstacle.obstacle_shape.rotate_translate_local(
+                state_new.position, state_new.orientation
+            )
             occ_new = Occupancy(time_step, shape_new)
             self._traj_state_list.append(state_new)
             self._pred_occ.append(occ_new)
             self._state_current = state_new
             self._occ_current = occ_new
             self._set_ids_lanelets_current = set(
-                self._current_scenario.lanelet_network.find_lanelet_by_shape(self._occ_current.shape)
+                self._current_scenario.lanelet_network.find_lanelet_by_shape(
+                    self._occ_current.shape
+                )
             )
 
     def _calculate_new_state(self, time_step: int):
@@ -56,33 +62,48 @@ class IDMAgent(Agent):
 
             # convert state to curvilinear coordinate system
             state_current = self._state_current
-            p_lon_current, p_lat_current, v_lon_current, v_lat_current, o_ref = self._convert_to_curvilinear_state(
-                state_current, self._clcs_main
+            p_lon_current, p_lat_current, v_lon_current, v_lat_current, o_ref = (
+                self._convert_to_curvilinear_state(state_current, self._clcs_main)
             )
 
             a_lon_new = self._calculate_acceleration(v_lon_current)
 
             # covered distance along the center line of the lanelet
-            dist_p_lon = 0.5 * a_lon_new * self._current_scenario.dt**2 + v_lon_current * self._current_scenario.dt
+            dist_p_lon = (
+                0.5 * a_lon_new * self._current_scenario.dt**2
+                + v_lon_current * self._current_scenario.dt
+            )
             p_lon_new = p_lon_current + dist_p_lon
             # shift lateral position towards the centerline
-            p_lat_new = p_lat_current + (-0.0 * np.sign(p_lat_current) if abs(p_lat_current) > 0.2 else 0)
+            p_lat_new = p_lat_current + (
+                -0.0 * np.sign(p_lat_current) if abs(p_lat_current) > 0.2 else 0
+            )
 
             v_lon_new = v_lon_current + a_lon_new * self._current_scenario.dt
-            v_lat_new = v_lat_current + (-0.1 * np.sign(v_lat_current) if abs(v_lat_current > 0.2) else 0)
+            v_lat_new = v_lat_current + (
+                -0.1 * np.sign(v_lat_current) if abs(v_lat_current > 0.2) else 0
+            )
             v_new = np.sqrt(v_lon_new**2 + v_lat_new**2)
 
             # new position in Cartesian coordinate system
-            x_new, y_new = self._clcs_main.convert_to_cartesian_coords(p_lon_new, p_lat_new)
+            x_new, y_new = self._clcs_main.convert_to_cartesian_coords(
+                p_lon_new, p_lat_new
+            )
             position_new = np.array([x_new, y_new])
 
             # steers towards the centerline
             diff_o = state_current.orientation - o_ref
-            o_new = state_current.orientation + (-0.05 * np.sign(diff_o) if abs(diff_o) > 0.05 else 0)
+            o_new = state_current.orientation + (
+                -0.05 * np.sign(diff_o) if abs(diff_o) > 0.05 else 0
+            )
 
             # create new state
             state_new = CustomState(
-                position=position_new, orientation=o_new, velocity=v_new, acceleration=a_lon_new, time_step=time_step
+                position=position_new,
+                orientation=o_new,
+                velocity=v_new,
+                acceleration=a_lon_new,
+                time_step=time_step,
             )
 
             return state_new
@@ -91,7 +112,9 @@ class IDMAgent(Agent):
             obstacle = self._obstacle
             for lanelet in self._current_scenario.lanelet_network.lanelets:
                 try:
-                    lanelet.dynamic_obstacles_on_lanelet.get(time_step - 1).discard(obstacle.obstacle_id)
+                    lanelet.dynamic_obstacles_on_lanelet.get(time_step - 1).discard(
+                        obstacle.obstacle_id
+                    )
 
                 except AttributeError:
                     lanelet.dynamic_obstacles_on_lanelet[time_step - 1] = set()
@@ -111,7 +134,9 @@ class IDMAgent(Agent):
         id_leader = None
         for lanelet in self._list_lanelets_merged:
             clcs = self._dict_clcs[lanelet.lanelet_id]
-            p_lon_ego, _ = clcs.convert_to_curvilinear_coords(state_ego.position[0], state_ego.position[1])
+            p_lon_ego, _ = clcs.convert_to_curvilinear_coords(
+                state_ego.position[0], state_ego.position[1]
+            )
 
             set_ids_obstacles_in_lanelet = self._dynamic_obstacles_in_lanelet_set(
                 self._dict_lanelet_merge_ids[lanelet.lanelet_id], time_step
@@ -143,7 +168,9 @@ class IDMAgent(Agent):
                         continue
 
                 try:
-                    p_lon_obs, _ = clcs.convert_to_curvilinear_coords(state_obs.position[0], state_obs.position[1])
+                    p_lon_obs, _ = clcs.convert_to_curvilinear_coords(
+                        state_obs.position[0], state_obs.position[1]
+                    )
 
                 except ValueError:
                     continue
@@ -154,7 +181,9 @@ class IDMAgent(Agent):
                     list_tuples_obstacles_in_lanelet.append((dist_to_obs, id_obs))
 
             if list_tuples_obstacles_in_lanelet:
-                dist_to_leader_min_temp, id_obs_min = min(list_tuples_obstacles_in_lanelet)
+                dist_to_leader_min_temp, id_obs_min = min(
+                    list_tuples_obstacles_in_lanelet
+                )
 
                 if dist_to_leader_min_temp < dist_to_leader_min:
                     # new smallest distance
@@ -168,7 +197,9 @@ class IDMAgent(Agent):
         # calculate the approaching rate
         obs_follow = obs_ego
         obs_lead = self._current_scenario.obstacle_by_id(id_leader)
-        rate_approaching = self.calculate_approaching_rate(obs_follow, obs_lead, time_step)
+        rate_approaching = self.calculate_approaching_rate(
+            obs_follow, obs_lead, time_step
+        )
 
         self._id_agent_leader = id_leader
         self._dis_to_leader = dist_to_leader_min
@@ -187,7 +218,9 @@ class IDMAgent(Agent):
                 return 0
 
         # free road term
-        a_free = self._config.a_lon_max * (1 - (v_lon_current / self._config.v_desired) ** self._config.coef)
+        a_free = self._config.a_lon_max * (
+            1 - (v_lon_current / self._config.v_desired) ** self._config.coef
+        )
 
         # interaction term
         if self._id_agent_leader:
@@ -196,7 +229,10 @@ class IDMAgent(Agent):
             term_3 = (v_lon_current * self._rate_approach) / (
                 2 * np.sqrt(self._config.a_lon_max * self._config.a_lon_comfort)
             )
-            a_interact = -self._config.a_lon_max * ((term_1 + term_2 + term_3) / self._dis_to_leader) ** 2
+            a_interact = (
+                -self._config.a_lon_max
+                * ((term_1 + term_2 + term_3) / self._dis_to_leader) ** 2
+            )
 
         else:
             a_interact = 0
@@ -217,17 +253,27 @@ class IDMAgent(Agent):
         dict_all_clcs = self._dict_clcs
         dict_all_lanelet_merge_ids = self._dict_lanelet_merge_ids
         for id_lanelet_current in set_ids_lanelet_current:
-            lanelet_current = self._current_scenario.lanelet_network.find_lanelet_by_id(id_lanelet_current)
+            lanelet_current = self._current_scenario.lanelet_network.find_lanelet_by_id(
+                id_lanelet_current
+            )
 
             # only create one merged lanelet and CLCS for longitudinally adjacent current lanelets
-            if any(lanelet_id in set_ids_lanelet_current for lanelet_id in lanelet_current.predecessor):
+            if any(
+                lanelet_id in set_ids_lanelet_current
+                for lanelet_id in lanelet_current.predecessor
+            ):
                 continue
 
-            list_lanelets_merged, dict_clcs, dict_merge_ids = self._merge_lanelet_and_create_clcs(
-                lanelet=lanelet_current, merge_predecessors=False
+            list_lanelets_merged, dict_clcs, dict_merge_ids = (
+                self._merge_lanelet_and_create_clcs(
+                    lanelet=lanelet_current, merge_predecessors=False
+                )
             )
             dict_all_clcs = {**dict_all_clcs, **dict_clcs}
-            dict_all_lanelet_merge_ids = {**dict_all_lanelet_merge_ids, **dict_merge_ids}
+            dict_all_lanelet_merge_ids = {
+                **dict_all_lanelet_merge_ids,
+                **dict_merge_ids,
+            }
             list_all_lanelets_merged += list_lanelets_merged
 
         self._dict_clcs = dict_all_clcs

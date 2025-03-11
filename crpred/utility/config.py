@@ -90,7 +90,9 @@ class BaseParam:
         try:
             value = self.__getattribute__(item)
         except AttributeError as e:
-            raise KeyError(f"{item} is not a parameter of {self.__class__.__name__}") from e
+            raise KeyError(
+                f"{item} is not a parameter of {self.__class__.__name__}"
+            ) from e
         return value
 
     def __setitem__(self, key: str, value: Any):
@@ -103,10 +105,14 @@ class BaseParam:
         try:
             self.__setattr__(key, value)
         except AttributeError as e:
-            raise KeyError(f"{key} is not a parameter of {self.__class__.__name__}") from e
+            raise KeyError(
+                f"{key} is not a parameter of {self.__class__.__name__}"
+            ) from e
 
     @classmethod
-    def load(cls, file_path: Union[pathlib.Path, str], validate_types: bool = True) -> "BaseParam":
+    def load(
+        cls, file_path: Union[pathlib.Path, str], validate_types: bool = True
+    ) -> "BaseParam":
         """
         Loads config file and creates parameter class.
 
@@ -115,7 +121,9 @@ class BaseParam:
         :return: Base parameter class.
         """
         file_path = pathlib.Path(file_path)
-        assert file_path.suffix == ".yaml", f"File type {file_path.suffix} is unsupported! Please use .yaml!"
+        assert (
+            file_path.suffix == ".yaml"
+        ), f"File type {file_path.suffix} is unsupported! Please use .yaml!"
         loaded_yaml = OmegaConf.load(file_path)
         if validate_types:
             OmegaConf.merge(OmegaConf.structured(PredictorParams), loaded_yaml)
@@ -130,7 +138,10 @@ class BaseParam:
         """
         # Avoid saving private attributes
         dict_cfg = dataclasses.asdict(
-            self, dict_factory=lambda items: {key: val for key, val in items if not key.startswith("_")}
+            self,
+            dict_factory=lambda items: {
+                key: val for key, val in items if not key.startswith("_")
+            },
         )
         OmegaConf.save(OmegaConf.create(dict_cfg), file_path, resolve=True)
 

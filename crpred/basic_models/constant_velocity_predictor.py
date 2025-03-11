@@ -5,7 +5,10 @@ from commonroad.scenario.state import CustomState
 from commonroad_clcs.clcs import CurvilinearCoordinateSystem
 from commonroad_dc.costs.route_matcher import get_orientation_at_position
 
-from crpred.basic_models.motion_model_predictor import InitialStateValues, MotionModelPredictor
+from crpred.basic_models.motion_model_predictor import (
+    InitialStateValues,
+    MotionModelPredictor,
+)
 from crpred.utility.config import PredictorParams
 
 
@@ -22,8 +25,12 @@ class ConstantVelocityLinearPredictor(MotionModelPredictor):
     ) -> List[CustomState]:
         pred_state_list: List[CustomState] = []
 
-        delta_v_lon_0: float = initial_values.v * np.cos(initial_values.orientation_in_ccosy) * dt
-        delta_v_lat_0: float = initial_values.v * np.sin(initial_values.orientation_in_ccosy) * dt
+        delta_v_lon_0: float = (
+            initial_values.v * np.cos(initial_values.orientation_in_ccosy) * dt
+        )
+        delta_v_lat_0: float = (
+            initial_values.v * np.sin(initial_values.orientation_in_ccosy) * dt
+        )
         p_lon = initial_values.p_lon
         p_lat = initial_values.p_lat
 
@@ -33,8 +40,12 @@ class ConstantVelocityLinearPredictor(MotionModelPredictor):
 
             # Get the cartesian positions, etc.
             pred_pos = curvilinear_cosy.convert_to_cartesian_coords(p_lon, p_lat)
-            ccosy_orientation_next = get_orientation_at_position(curvilinear_cosy, pred_pos)
-            pred_orientation = ccosy_orientation_next + initial_values.orientation_in_ccosy
+            ccosy_orientation_next = get_orientation_at_position(
+                curvilinear_cosy, pred_pos
+            )
+            pred_orientation = (
+                ccosy_orientation_next + initial_values.orientation_in_ccosy
+            )
 
             pred_state = CustomState(
                 time_step=t,
@@ -76,7 +87,9 @@ class ConstantVelocityCurvilinearPredictor(MotionModelPredictor):
 
             # Get the cartesian positions, etc.
             pred_pos = curvilinear_cosy.convert_to_cartesian_coords(p_lon, p_lat)
-            ccosy_orientation_next = get_orientation_at_position(curvilinear_cosy, pred_pos)
+            ccosy_orientation_next = get_orientation_at_position(
+                curvilinear_cosy, pred_pos
+            )
             pred_orientation = ccosy_orientation_next + orientation_in_ccosy
 
             pred_state = CustomState(

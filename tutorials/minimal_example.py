@@ -2,7 +2,9 @@ from pathlib import Path
 
 from commonroad.common.file_reader import CommonRoadFileReader
 
-from crpred.basic_models.constant_velocity_predictor import ConstantVelocityCurvilinearPredictor
+from crpred.basic_models.constant_velocity_predictor import (
+    ConstantVelocityCurvilinearPredictor,
+)
 from crpred.utility.config import PredictorParams
 from crpred.utility.visualization import plot_scenario
 
