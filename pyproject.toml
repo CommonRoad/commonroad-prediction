@@ -25,12 +25,12 @@ packages = [{include = "crpred"}]
 #Source = "https://gitlab.lrz.de/tum-cps/commonroad_io"
 
 [tool.poetry.dependencies]
-python = "^3.9,<3.12"
+python = ">=3.10,<3.14"
 commonroad-io = ">=2024.1"
 imageio = "^2.31.1"
 commonroad-drivability-checker = ">=2025.1"
 commonroad-clcs = ">=2025.1"
-numpy = "<2.0"
+numpy = ">=1.26.1"
 
 [tool.poetry.group.dev]
 optional = true

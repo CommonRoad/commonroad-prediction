@@ -9,7 +9,8 @@ from commonroad.scenario.obstacle import DynamicObstacle
 from commonroad.scenario.scenario import Scenario
 from commonroad.scenario.state import TraceState
 from commonroad_clcs.clcs import CurvilinearCoordinateSystem
-from commonroad_dc.geometry.util import (
+from commonroad_clcs.config import CLCSParams
+from commonroad_clcs.util import (
     chaikins_corner_cutting,
     compute_orientation_from_polyline,
     compute_pathlength_from_polyline,
@@ -81,7 +82,7 @@ class Agent:
             )
             ref_path = resample_polyline(ref_path, 0.5)
 
-            clcs = CurvilinearCoordinateSystem(ref_path)
+            clcs = CurvilinearCoordinateSystem(ref_path, CLCSParams())
             clcs.compute_and_set_curvature()
             dict_clcs[lanelet.lanelet_id] = clcs
 
@@ -138,10 +139,10 @@ class Agent:
         state_ego: TraceState,
     ):
         obs_ego = self._obstacle
-        dist_to_leader_min = dist_to_follower_min = np.infty
+        dist_to_leader_min = dist_to_follower_min = np.inf
         leader_clcs = None
         id_leader = id_follower = None
-        rate_approaching_leader = rate_approaching_follower = np.infty
+        rate_approaching_leader = rate_approaching_follower = np.inf
 
         for lanelet in list_lanelets:
             clcs = dict_clcs[lanelet.lanelet_id]
