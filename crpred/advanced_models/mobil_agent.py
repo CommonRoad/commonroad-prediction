@@ -218,7 +218,7 @@ class MOBILAgent(Agent):
                 )
             else:
                 a_total_change_left = 0
-                a_follower_left_change = -np.infty
+                a_follower_left_change = -np.inf
 
             if self.right_clcs:
                 v_lon_follower_right_current = 0
@@ -289,7 +289,7 @@ class MOBILAgent(Agent):
                 )
             else:
                 a_total_change_right = 0
-                a_follower_right_change = -np.infty
+                a_follower_right_change = -np.inf
 
             if (
                 a_total_change_right < a_total_change_left
@@ -395,20 +395,20 @@ class MOBILAgent(Agent):
             self.rate_approaching_left_leader
         ) = self.rate_approaching_left_follower = self.rate_approaching_right_leader = (
             self.rate_approaching_right_follower
-        ) = np.infty
+        ) = np.inf
 
         self.dist_to_leader_min = self.dist_to_follower_min = (
             self.dist_to_left_leader_min
         ) = self.dist_to_left_follower_min = self.dist_to_right_leader_min = (
             self.dist_to_right_follower_min
-        ) = np.infty
+        ) = np.inf
 
         self.id_leader = self.id_follower = self.id_left_leader = (
             self.id_left_follower
         ) = self.id_right_leader = self.id_right_follower = None
 
         # find the best current lanelet based on ego acceleration
-        a_ego_best = -np.infty
+        a_ego_best = -np.inf
 
         for lanelet_id in self.set_ids_lanelets_current_pred_removed:
             (

@@ -130,7 +130,7 @@ class IDMAgent(Agent):
         state_ego = self.state_at_step(time_step, obs_ego, self._traj_state_list)
 
         # iterate through lanelet and its obstacles, find the one with the minimum positive distance to ego
-        dist_to_leader_min = np.infty
+        dist_to_leader_min = np.inf
         id_leader = None
         for lanelet in self._list_lanelets_merged:
             clcs = self._dict_clcs[lanelet.lanelet_id]
