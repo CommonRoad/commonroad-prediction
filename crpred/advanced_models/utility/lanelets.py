@@ -15,14 +15,22 @@ def all_lanelets_by_merging_predecessors_from_lanelet(
     :param max_length: maximal length of merged lanelets can be provided
     :return: List of merged lanelets, Lists of lanelet ids of which each merged lanelet consists
     """
-    assert isinstance(lanelet, Lanelet), "<Lanelet>: provided lanelet is not a valid Lanelet!"
-    assert isinstance(network, LaneletNetwork), "<Lanelet>: provided lanelet network is not a " "valid lanelet network!"
+    assert isinstance(
+        lanelet, Lanelet
+    ), "<Lanelet>: provided lanelet is not a valid Lanelet!"
+    assert isinstance(network, LaneletNetwork), (
+        "<Lanelet>: provided lanelet network is not a " "valid lanelet network!"
+    )
 
     if lanelet.predecessor is None or len(lanelet.predecessor) == 0:
         return [lanelet], [[lanelet.lanelet_id]]
 
-    merge_jobs = find_lanelet_predecessors_in_range(lanelet, network, max_length=max_length)
-    merge_jobs = [[lanelet] + [network.find_lanelet_by_id(p) for p in path] for path in merge_jobs]
+    merge_jobs = find_lanelet_predecessors_in_range(
+        lanelet, network, max_length=max_length
+    )
+    merge_jobs = [
+        [lanelet] + [network.find_lanelet_by_id(p) for p in path] for path in merge_jobs
+    ]
 
     # Create merged lanelets from paths
     merged_lanelets = []
@@ -53,7 +61,9 @@ def find_lanelet_predecessors_in_range(
     """
     paths = [[p] for p in lanelet.predecessor]
     paths_final = []
-    lengths = [lanelet_network.find_lanelet_by_id(p).distance[-1] for p in lanelet.predecessor]
+    lengths = [
+        lanelet_network.find_lanelet_by_id(p).distance[-1] for p in lanelet.predecessor
+    ]
     while paths:
         paths_next = []
         lengths_next = []

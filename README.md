@@ -1,15 +1,15 @@
 # CommonRoad-Prediction
-[![PyPI pyversions](https://img.shields.io/pypi/pyversions/commonroad-prediction.svg)](https://pypi.python.org/pypi/commonroad-prediction/)  
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)  
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/commonroad-prediction.svg)](https://pypi.python.org/pypi/commonroad-prediction/)
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 [![PyPI version fury.io](https://badge.fury.io/py/commonroad-prediction.svg)](https://pypi.python.org/pypi/commonroad-prediction/)
-[![PyPI download month](https://img.shields.io/pypi/dm/commonroad-prediction.svg?label=PyPI%20downloads)](https://pypi.python.org/pypi/commonroad-prediction/) 
-[![PyPI download week](https://img.shields.io/pypi/dw/commonroad-prediction.svg?label=PyPI%20downloads)](https://pypi.python.org/pypi/commonroad-prediction/)   
+[![PyPI download month](https://img.shields.io/pypi/dm/commonroad-prediction.svg?label=PyPI%20downloads)](https://pypi.python.org/pypi/commonroad-prediction/)
+[![PyPI download week](https://img.shields.io/pypi/dw/commonroad-prediction.svg?label=PyPI%20downloads)](https://pypi.python.org/pypi/commonroad-prediction/)
 [![PyPI license](https://img.shields.io/pypi/l/commonroad-prediction.svg)](https://pypi.python.org/pypi/commonroad-prediction/)
 
 A collection and interface for CommonRoad-based prediction algorithms.
 
 ## Project status
-Currently implemented and tested models:   
+Currently implemented and tested models:
 
 - Constant Velocity Linear Predictor [1]
 - Constant Velocity Curvilinear Predictor [1]
@@ -25,7 +25,7 @@ If you want to contribute a prediction algorithm, please create an issue/pull re
 
 
 ## Installation and Usage
-We recommend to use PyCharm (Professional) as IDE.  
+We recommend to use PyCharm (Professional) as IDE.
 ### Usage in other projects
 We provide an PyPI package which can be installed with the following command
 ```shell
@@ -42,7 +42,7 @@ poetry install
 ```
 
 ### Examples
-We recommend to use PyCharm (Professional) as IDE. 
+We recommend to use PyCharm (Professional) as IDE.
 An example script for visualizing predictions is provided [here](example.md).
 
 
@@ -64,16 +64,16 @@ Responsible: Roland Stolz, Sebastian Maierhofer
 
 
 ## References
-The implemented algorithms are based on the subsequent publications:  
+The implemented algorithms are based on the subsequent publications:
 
-[1] R. Schubert, E. Richter and G. Wanielik, 
+[1] R. Schubert, E. Richter and G. Wanielik,
 "Comparison and evaluation of advanced motion models for vehicle tracking,"
 Proc. of the IEEE Int. Conf. on Information Fusion, 2008, pp. 1-6.
 
-[2] M. Treiber, A. Hennecke, and D. Helbing, 
+[2] M. Treiber, A. Hennecke, and D. Helbing,
 "Congested traffic states in empirical observations and microscopic simulations,"
 Physical Review E, vol. 62, no. 2, pp. 1805–1824, 2000.
 
-[3] A. Kesting, M. Treiber, and D. Helbing, 
-“General lane-changing model MOBIL for car-following models,” 
+[3] A. Kesting, M. Treiber, and D. Helbing,
+“General lane-changing model MOBIL for car-following models,”
 Transportation Research Record, vol. 1999, pp. 86–94, Jan. 2007

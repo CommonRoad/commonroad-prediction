@@ -20,7 +20,8 @@ class PredictorFactory:
 
     @staticmethod
     def create_predictor(
-        config: PredictorParams, previous_states: Optional[Dict[int, List[State]]] = None
+        config: PredictorParams,
+        previous_states: Optional[Dict[int, List[State]]] = None,
     ) -> PredictorInterface:
         """
         Creates predictor.

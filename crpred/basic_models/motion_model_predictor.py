@@ -6,11 +6,11 @@ from commonroad.prediction.prediction import TrajectoryPrediction
 from commonroad.scenario.scenario import Scenario
 from commonroad.scenario.state import CustomState, InitialState
 from commonroad.scenario.trajectory import Trajectory
+from commonroad_clcs.clcs import CurvilinearCoordinateSystem
 from commonroad_dc.costs.route_matcher import (
     create_cosy_from_lanelet,
     get_orientation_at_position,
 )
-from commonroad_dc.pycrccosy import CurvilinearCoordinateSystem
 
 from crpred.predictor_interface import PredictorInterface
 from crpred.utility.common import get_merged_laneletes_from_position
@@ -47,7 +47,9 @@ class MotionModelPredictor(PredictorInterface):
         pred_sc = copy.deepcopy(sc)
         dt = self._config.dt
         if sc.dt != dt:
-            print(f"Warning: dt from config ({dt}) is not the same as dt from the scenario ({sc.dt})")
+            print(
+                f"Warning: dt from config ({dt}) is not the same as dt from the scenario ({sc.dt})"
+            )
 
         for idx, dyno in enumerate(sc.dynamic_obstacles):
             if dyno.prediction:
@@ -73,15 +75,21 @@ class MotionModelPredictor(PredictorInterface):
             merged_lanelets, merged_lanelets_id = get_merged_laneletes_from_position(
                 sc.lanelet_network, initial_state.position
             )
-            curvilinear_cosy: CurvilinearCoordinateSystem = create_cosy_from_lanelet(merged_lanelets[0])
+            curvilinear_cosy: CurvilinearCoordinateSystem = create_cosy_from_lanelet(
+                merged_lanelets[0]
+            )
 
-            curvilinear_pos: Tuple[float, float] = curvilinear_cosy.convert_to_curvilinear_coords(
-                initial_state.position[0], initial_state.position[1]
+            curvilinear_pos: Tuple[float, float] = (
+                curvilinear_cosy.convert_to_curvilinear_coords(
+                    initial_state.position[0], initial_state.position[1]
+                )
             )
             pos_lon, pos_lat = curvilinear_pos
 
             # Calculate the orientation in the curvilinear coordinate system
-            ccosy_orientation = get_orientation_at_position(curvilinear_cosy, initial_state.position)
+            ccosy_orientation = get_orientation_at_position(
+                curvilinear_cosy, initial_state.position
+            )
             orientation_diff = initial_state.orientation - ccosy_orientation
 
             initial_state_values = InitialStateValues(

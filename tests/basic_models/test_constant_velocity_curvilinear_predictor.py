@@ -26,8 +26,12 @@ class TestConstantVelocityCurvilinearPredictor(MotionModelPredictorTest):
 
         final_state = dyno.initial_state.__getattribute__(
             "position"
-        ) + self.test_config.num_steps_prediction * scenario.dt * np.array([velocity, 0])
-        np.testing.assert_array_equal(dyno.prediction.trajectory.state_list[-1].position, final_state)
+        ) + self.test_config.num_steps_prediction * scenario.dt * np.array(
+            [velocity, 0]
+        )
+        np.testing.assert_array_equal(
+            dyno.prediction.trajectory.state_list[-1].position, final_state
+        )
 
     def test_prediction_const_acceleration(self):
         acceleration = 1.0
@@ -40,7 +44,9 @@ class TestConstantVelocityCurvilinearPredictor(MotionModelPredictorTest):
             assert state.orientation == 0.0
 
         final_state = dyno.initial_state.__getattribute__("position")
-        np.testing.assert_array_equal(dyno.prediction.trajectory.state_list[-1].position, final_state)
+        np.testing.assert_array_equal(
+            dyno.prediction.trajectory.state_list[-1].position, final_state
+        )
 
     def test_prediction_const_yaw_rate(self):
         yaw_rate = 0.1
@@ -50,11 +56,15 @@ class TestConstantVelocityCurvilinearPredictor(MotionModelPredictorTest):
 
         for i, state in enumerate(dyno.prediction.trajectory.state_list):
             assert state.velocity == 0.0
-            assert state.orientation == pytest.approx((i + 1) * yaw_rate * scenario.dt, 0.001)
+            assert state.orientation == pytest.approx(
+                (i + 1) * yaw_rate * scenario.dt, 0.001
+            )
             assert state.yaw_rate == 0.1
 
         final_state = dyno.initial_state.__getattribute__("position")
-        np.testing.assert_array_equal(dyno.prediction.trajectory.state_list[-1].position, final_state)
+        np.testing.assert_array_equal(
+            dyno.prediction.trajectory.state_list[-1].position, final_state
+        )
 
 
 # Run the tests

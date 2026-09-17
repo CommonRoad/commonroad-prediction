@@ -28,7 +28,9 @@ def get_scenarios_from_files(n: int, scenario_dir: Path = None):
         print("\u2713")  # checkmark
 
     if not result:
-        raise FileNotFoundError(f"No XML files were found in {scenario_dir.absolute()})!")
+        raise FileNotFoundError(
+            f"No XML files were found in {scenario_dir.absolute()})!"
+        )
 
     return random.sample(result, n)
 
@@ -45,9 +47,13 @@ def calc_scenario_difference(s: Scenario, p: Scenario) -> Dict[int, Dict[int, fl
         original_trajectory: Trajectory = dyno.prediction.trajectory
         predicted_trajectory: Trajectory = p.obstacle_by_id(s_id).prediction.trajectory
 
-        first_common_time_step: int = max(original_trajectory.initial_time_step, predicted_trajectory.initial_time_step)
+        first_common_time_step: int = max(
+            original_trajectory.initial_time_step,
+            predicted_trajectory.initial_time_step,
+        )
         last_common_time_step: int = min(
-            original_trajectory.state_list[-1].time_step, predicted_trajectory.state_list[-1].time_step
+            original_trajectory.state_list[-1].time_step,
+            predicted_trajectory.state_list[-1].time_step,
         )
 
         common_steps: List[Tuple[State, State]] = list(
