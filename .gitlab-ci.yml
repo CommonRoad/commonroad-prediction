@@ -31,7 +31,7 @@ test_python_versions:
   stage: test
   parallel :
     matrix :
-      - PYTHON_VERSIONS : [ "3.9", "3.10"] #, "3.11" ]
+      - PYTHON_VERSIONS: [ "3.10", "3.11", "3.12", "3.13" ]
   script:
     - *run-test-with-coverage
   needs: []
@@ -54,7 +54,7 @@ build_and_update_packages_debian:
   stage: test
   parallel :
     matrix :
-      - PYTHON_VERSIONS : [ "3.9", "3.10", "3.11" ]
+      - PYTHON_VERSIONS: [ "3.10", "3.11", "3.12", "3.13" ]
   script:
     - poetry update
     - poetry install

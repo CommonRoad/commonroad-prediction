@@ -1,16 +1,16 @@
 [tool.poetry]
 name = "commonroad-prediction"
-version = "0.1.1"
+version = "0.1.2"
 description = "A collection and interface for CommonRoad prediction algorithms."
 authors = ["Cyber-Physical Systems Group, Technical University of Munich <commonroad@lists.lrz.de>"]
 license = "BSD-3-Clause"
 homepage = "https://commonroad.in.tum.de"
 keywords= ["autonomous", "automated", "vehicles", "driving", "motion", "planning", "prediction"]
 classifiers = [
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-#    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: BSD License",
     "Operating System :: POSIX :: Linux",
 #    "Operating System :: MacOS",
